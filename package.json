@@ -1,0 +1,62 @@
+{
+  "name": "@usacognition/mcp-metabase-server",
+  "version": "1.0.1",
+  "description": "A Model Context Protocol server for Metabase integration",
+  "author": "Cognition <devin@cognition.ai>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/usacognition/metabase-mcp-server.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/usacognition/metabase-mcp-server",
+  "bugs": {
+    "url": "https://github.com/usacognition/metabase-mcp-server/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "metabase",
+    "analytics",
+    "business-intelligence",
+    "ai",
+    "claude"
+  ],
+  "private": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "mcp-metabase-server": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\" && mkdir -p dist && cp -r build/* dist/",
+    "watch": "tsc --watch",
+    "inspector": "npx @modelcontextprotocol/inspector dist/index.js",
+    "start": "node dist/index.js --port=8080",
+    "dev": "npm run build && npm start",
+    "clean": "rm -rf build dist",
+    "test": "npm run build && echo 'Tests would go here'",
+    "lint": "echo 'Linting would go here'",
+    "docker:build": "docker build -t mcp-metabase-server .",
+    "docker:run": "docker run -it --rm mcp-metabase-server",
+    "docker:compose": "docker-compose up"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.6.1",
+    "abort-controller": "^3.0.0",
+    "axios": "^1.8.2",
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.22",
+    "typescript": "^5.3.3"
+  }
+}

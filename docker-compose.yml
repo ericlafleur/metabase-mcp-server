@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  mcp-metabase-server:
+    build: .
+    container_name: mcp-metabase-server
+    environment:
+      # Required: Your Metabase instance URL
+      - METABASE_URL=https://your-metabase-instance.com
+      
+      # Option 1: Use API Key (recommended)
+      - METABASE_API_KEY=your_metabase_api_key
+      
+      # Option 2: Use Username/Password (if API key not available)
+      # - METABASE_USERNAME=your_username
+      # - METABASE_PASSWORD=your_password
+      
+      # Optional: Set log level
+      - LOG_LEVEL=info
+      
+      # Optional: Node environment
+      - NODE_ENV=production
+    
+    # Use stdin and tty for MCP communication
+    stdin_open: true
+    tty: true
+    
+    # Optional: Mount volumes for persistent data if needed
+    # volumes:
+    #   - ./data:/app/data
+    
+    # Optional: Network settings
+    # networks:
+    #   - mcp-network
+    
+    # Optional: Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Optional: Health check
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('Health check passed')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+# Optional: Create custom network
+# networks:
+#   mcp-network:
+#     driver: bridge
+
+# Optional: Named volumes
+# volumes:
+#   mcp-data:
+#     driver: local
