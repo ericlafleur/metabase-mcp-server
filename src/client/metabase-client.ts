@@ -117,6 +117,7 @@ export class MetabaseClient {
 
   // Dashboard operations
   async getDashboards(): Promise<Dashboard[]> {
+    this.logInfo("Aakash: getDashboards")
     await this.ensureAuthenticated();
     const response = await this.axiosInstance.get("/api/dashboard");
     return response.data;

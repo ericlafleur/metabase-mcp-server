@@ -64,6 +64,8 @@ export class MetabaseServer {
     this.setupResourceHandlers();
     this.setupToolHandlers();
     this.setupErrorHandling();
+
+    this.logInfo("Aakash: Metabase MCP server initialized");
   }
 
   private setupResourceHandlers(): void {
