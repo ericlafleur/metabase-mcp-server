@@ -826,9 +826,7 @@ export class DashboardToolHandlers {
   }
 
   private async listDashboards(): Promise<any> {
-    console.error("🔍 [MCP Server] list_dashboards tool called - fetching all dashboards from Metabase");
     const dashboards = await this.client.getDashboards();
-    console.error(`✅ [MCP Server] Successfully retrieved ${dashboards.length} dashboards from Metabase`);
     return {
       content: [
         {
