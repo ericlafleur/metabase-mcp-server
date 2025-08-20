@@ -10,6 +10,7 @@ import { dashboardTools } from "../tools/dashboard-tools.js";
 import { cardTools } from "../tools/card-tools.js";
 import { databaseTools } from "../tools/database-tools.js";
 import { tableTools } from "../tools/table-tools.js";
+import { additionalTools } from "../tools/additional-tools.js";
 
 export class ConfigRegistry {
   private toolConfigs: Record<string, ToolConfig>;
@@ -20,6 +21,7 @@ export class ConfigRegistry {
       ...cardTools,
       ...databaseTools,
       ...tableTools,
+      ...additionalTools,
     };
   }
 

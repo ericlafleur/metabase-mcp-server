@@ -7,25 +7,18 @@ import { ConfigRegistry } from "./config-tool-registry.js";
 import { ErrorCode, McpError } from "../types/errors.js";
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
 import { ToolFilterOptions } from "../types/metabase.js";
-import { AdditionalToolHandlers } from "./additional-tools.js";
-
 export class ToolRegistry {
   private configRegistry: ConfigRegistry;
-  private additionalHandlers: AdditionalToolHandlers;
 
   constructor(private client: MetabaseClient, private filterOptions?: ToolFilterOptions) {
     this.configRegistry = new ConfigRegistry(client);
-    this.additionalHandlers = new AdditionalToolHandlers(client);
   }
 
   /**
    * Get all available tool schemas
    */
   getAllToolSchemas(): Tool[] {
-    const configTools = this.configRegistry.getAllToolSchemas();
-    const additionalTools = this.additionalHandlers.getToolSchemas();
-    const allTools = [...configTools, ...additionalTools];
-
+    const allTools = this.configRegistry.getAllToolSchemas();
     return this.filterTools(allTools);
   }
 
@@ -33,16 +26,7 @@ export class ToolRegistry {
    * Handle a tool call
    */
   async handleTool(name: string, args: any): Promise<any> {
-    // Try config-driven tools first
-    try {
-      return await this.configRegistry.handleTool(name, args);
-    } catch (error) {
-      if (error instanceof McpError && error.code === ErrorCode.MethodNotFound) {
-        // Fall back to additional tools
-        return await this.additionalHandlers.handleTool(name, args);
-      }
-      throw error;
-    }
+    return await this.configRegistry.handleTool(name, args);
   }
 
   /**
