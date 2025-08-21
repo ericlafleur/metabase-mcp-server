@@ -1,680 +1,450 @@
-/**
- * Dashboard tools configuration
- */
+import { z } from "zod";
+import { MetabaseClient } from "../client/metabase-client.js";
 
-import { ToolConfig, defaultResponseFormatter } from "../types/tool-config.js";
-import { ErrorCode, McpError } from "../types/errors.js";
-
-export const dashboardTools: Record<string, ToolConfig> = {
-  list_dashboards: {
+export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
+  // GET /api/dashboard - List all dashboards
+  server.addTool({
     name: "list_dashboards",
-    description: "List all dashboards in Metabase",
-    inputSchema: {
-      type: "object",
-      properties: {},
-    },
-    handler: async (client, args) => {
-      const dashboards = await client.getDashboards();
-      return defaultResponseFormatter(dashboards);
-    }
-  },
-
-  create_dashboard: {
-    name: "create_dashboard",
-    description: "Create a new Metabase dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        name: { type: "string", description: "Name of the dashboard" },
-        description: {
-          type: "string",
-          description: "Optional description for the dashboard",
-        },
-        parameters: {
-          type: "array",
-          description: "Optional parameters for the dashboard",
-          items: { type: "object" },
-        },
-        collection_id: {
-          type: "number",
-          description: "Optional ID of the collection to save the dashboard in",
-        },
-      },
-      required: ["name"],
-    },
-    validate: (args) => {
-      if (!args.name) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard name is required");
+    description: "Get all dashboards from Metabase",
+    execute: async () => {
+      try {
+        const dashboards = await metabaseClient.getDashboards();
+        return JSON.stringify(dashboards, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to fetch dashboards: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     },
-    handler: async (client, args) => {
-      const dashboardData: any = { name: args.name };
-      if (args.description !== undefined) dashboardData.description = args.description;
-      if (args.parameters !== undefined) dashboardData.parameters = args.parameters;
-      if (args.collection_id !== undefined) dashboardData.collection_id = args.collection_id;
+  });
 
-      const dashboard = await client.createDashboard(dashboardData);
-      return defaultResponseFormatter(dashboard);
-    }
-  },
-
-  get_dashboard: {
+  // GET /api/dashboard/:id - Get specific dashboard details
+  server.addTool({
     name: "get_dashboard",
-    description: "Get a specific dashboard by ID",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-      },
-      required: ["dashboard_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID is required");
+    description: "Get specific dashboard details by ID",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard to retrieve"),
+    }),
+    execute: async (args: { dashboard_id: number }) => {
+      try {
+        const dashboard = await metabaseClient.getDashboard(args.dashboard_id);
+        return JSON.stringify(dashboard, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to fetch dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     },
-    handler: async (client, args) => {
-      const dashboard = await client.getDashboard(args.dashboard_id);
-      return defaultResponseFormatter(dashboard);
-    }
-  },
+  });
 
-  delete_dashboard: {
-    name: "delete_dashboard",
-    description: "Delete a Metabase dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard to delete",
-        },
-      },
-      required: ["dashboard_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID is required");
-      }
-    },
-    handler: async (client, args) => {
-      await client.deleteDashboard(args.dashboard_id);
-      return defaultResponseFormatter({ message: `Dashboard ${args.dashboard_id} deleted successfully` });
-    }
-  },
-
-  get_dashboard_cards: {
+  // GET /api/dashboard/:id/cards - Get all cards in a specific dashboard
+  server.addTool({
     name: "get_dashboard_cards",
-    description: "Get all cards in a dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-      },
-      required: ["dashboard_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID is required");
+    description: "Get all cards in a specific dashboard",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard"),
+    }),
+    execute: async (args: { dashboard_id: number }) => {
+      try {
+        const dashboard = await metabaseClient.getDashboard(args.dashboard_id);
+        const cards = dashboard.cards || [];
+        return JSON.stringify(cards, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to fetch cards for dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     },
-    handler: async (client, args) => {
-      const cards = await client.apiCall("GET", `/api/dashboard/${args.dashboard_id}/cards`);
-      return defaultResponseFormatter(cards);
-    }
-  },
+  });
 
-  update_dashboard: {
-    name: "update_dashboard",
-    description: "Update an existing Metabase dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard to update",
-        },
-        name: { type: "string", description: "New name for the dashboard" },
-        description: {
-          type: "string",
-          description: "New description for the dashboard",
-        },
-        parameters: {
-          type: "array",
-          description: "New parameters for the dashboard",
-          items: { type: "object" },
-        },
-        collection_id: {
-          type: "number",
-          description: "New collection ID for the dashboard",
-        },
-      },
-      required: ["dashboard_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID is required");
-      }
-    },
-    handler: async (client, args) => {
-      const { dashboard_id, ...updateData } = args;
-      const filteredData = Object.fromEntries(
-        Object.entries(updateData).filter(([_, value]) => value !== undefined)
-      );
-      const dashboard = await client.apiCall("PUT", `/api/dashboard/${dashboard_id}`, filteredData);
-      return defaultResponseFormatter(dashboard);
-    }
-  },
-
-  remove_card_from_dashboard: {
-    name: "remove_card_from_dashboard",
-    description: "Remove a card from a dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-        card_id: {
-          type: "number",
-          description: "ID of the card to remove",
-        },
-      },
-      required: ["dashboard_id", "card_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id || !args.card_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID and Card ID are required");
-      }
-    },
-    handler: async (client, args) => {
-      await client.apiCall("DELETE", `/api/dashboard/${args.dashboard_id}/cards`, { cardId: args.card_id });
-      return defaultResponseFormatter({ message: `Card ${args.card_id} removed from dashboard ${args.dashboard_id}` });
-    }
-  },
-
-  update_dashboard_card: {
-    name: "update_dashboard_card",
-    description: "Update card position, size, and settings on a dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-        card_id: {
-          type: "number",
-          description: "ID of the card",
-        },
-        col: { type: "number", description: "Column position" },
-        row: { type: "number", description: "Row position" },
-        size_x: { type: "number", description: "Width in grid units" },
-        size_y: { type: "number", description: "Height in grid units" },
-        parameter_mappings: {
-          type: "array",
-          description: "Parameter mappings",
-          items: { type: "object" },
-        },
-        visualization_settings: {
-          type: "object",
-          description: "Visualization settings",
-        },
-      },
-      required: ["dashboard_id", "card_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id || !args.card_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID and Card ID are required");
-      }
-    },
-    handler: async (client, args) => {
-      const { dashboard_id, card_id, ...updateData } = args;
-      const filteredData = Object.fromEntries(
-        Object.entries(updateData).filter(([_, value]) => value !== undefined)
-      );
-      const result = await client.apiCall("PUT", `/api/dashboard/${dashboard_id}/cards/${card_id}`, filteredData);
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  post_dashboard_query: {
-    name: "post_dashboard_query",
-    description: "Execute a query for a dashboard card",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-        card_id: {
-          type: "number",
-          description: "ID of the card",
-        },
-        parameters: {
-          type: "object",
-          description: "Query parameters",
-        },
-      },
-      required: ["dashboard_id", "card_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id || !args.card_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID and Card ID are required");
-      }
-    },
-    handler: async (client, args) => {
-      const { dashboard_id, card_id, parameters = {} } = args;
-      const result = await client.apiCall("POST", `/api/dashboard/${dashboard_id}/card/${card_id}/query`, { parameters });
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  post_dashboard_copy: {
-    name: "post_dashboard_copy",
-    description: "Copy a dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard to copy from",
-        },
-        name: {
-          type: "string",
-          description: "Name for the new dashboard",
-        },
-        collection_id: {
-          type: "number",
-          description: "Collection ID for the new dashboard",
-        },
-      },
-      required: ["dashboard_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID is required");
-      }
-    },
-    handler: async (client, args) => {
-      const { dashboard_id, ...copyData } = args;
-      const filteredData = Object.fromEntries(
-        Object.entries(copyData).filter(([_, value]) => value !== undefined)
-      );
-      const result = await client.apiCall("POST", `/api/dashboard/${dashboard_id}/copy`, filteredData);
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  put_dashboard_cards: {
-    name: "put_dashboard_cards",
-    description: "Update all cards in a dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-        cards: {
-          type: "array",
-          description: "Array of card configurations",
-          items: { type: "object" },
-        },
-      },
-      required: ["dashboard_id", "cards"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id || !args.cards) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID and cards array are required");
-      }
-    },
-    handler: async (client, args) => {
-      const result = await client.apiCall("PUT", `/api/dashboard/${args.dashboard_id}/cards`, { cards: args.cards });
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  get_dashboard_items: {
-    name: "get_dashboard_items",
-    description: "Get all items in a dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-      },
-      required: ["dashboard_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID is required");
-      }
-    },
-    handler: async (client, args) => {
-      const items = await client.apiCall("GET", `/api/dashboard/${args.dashboard_id}/items`);
-      return defaultResponseFormatter(items);
-    }
-  },
-
-  post_dashboard_public_link: {
-    name: "post_dashboard_public_link",
-    description: "Create a public link for a dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-      },
-      required: ["dashboard_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID is required");
-      }
-    },
-    handler: async (client, args) => {
-      const result = await client.apiCall("POST", `/api/dashboard/${args.dashboard_id}/public_link`);
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  delete_dashboard_public_link: {
-    name: "delete_dashboard_public_link",
-    description: "Delete a public link for a dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-      },
-      required: ["dashboard_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID is required");
-      }
-    },
-    handler: async (client, args) => {
-      await client.apiCall("DELETE", `/api/dashboard/${args.dashboard_id}/public_link`);
-      return defaultResponseFormatter({ message: `Public link for dashboard ${args.dashboard_id} deleted` });
-    }
-  },
-
-  get_dashboard_embeddable: {
-    name: "get_dashboard_embeddable",
-    description: "Get embeddable dashboards",
-    inputSchema: {
-      type: "object",
-      properties: {},
-    },
-    handler: async (client, args) => {
-      const result = await client.apiCall("GET", "/api/dashboard/embeddable");
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  get_dashboard_params_valid_filter_fields: {
-    name: "get_dashboard_params_valid_filter_fields",
-    description: "Get valid filter fields for dashboard parameters",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-        parameter_id: {
-          type: "string",
-          description: "ID of the parameter",
-        },
-      },
-      required: ["dashboard_id", "parameter_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id || !args.parameter_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID and Parameter ID are required");
-      }
-    },
-    handler: async (client, args) => {
-      const result = await client.apiCall("GET", `/api/dashboard/${args.dashboard_id}/params/${args.parameter_id}/valid-filter-fields`);
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  get_dashboard_public: {
-    name: "get_dashboard_public",
-    description: "Get public dashboards",
-    inputSchema: {
-      type: "object",
-      properties: {},
-    },
-    handler: async (client, args) => {
-      const result = await client.apiCall("GET", "/api/dashboard/public");
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  post_dashboard_save: {
-    name: "post_dashboard_save",
-    description: "Save a denormalized description of dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        name: {
-          type: "string",
-          description: "Optional name of the dashboard"
-        },
-        description: {
-          type: "string",
-          description: "Optional description of the dashboard"
-        },
-        parameters: {
-          type: "array",
-          description: "Dashboard parameters",
-          items: { type: "object" }
-        },
-        cards: {
-          type: "array",
-          description: "Dashboard cards",
-          items: { type: "object" }
-        },
-      },
-    },
-    handler: async (client, args) => {
-      const result = await client.apiCall("POST", "/api/dashboard/save", args);
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  post_dashboard_query_export: {
-    name: "post_dashboard_query_export",
-    description: "Run the query associated with a Saved Question (Card) in the context of a Dashboard that includes it, and return its results as a file in the specified format",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-        card_id: {
-          type: "number",
-          description: "ID of the card",
-        },
-        export_format: {
-          type: "string",
-          description: "Export format (csv, json, xlsx, etc.)",
-        },
-        parameters: {
-          type: "object",
-          description: "Query parameters",
-        },
-      },
-      required: ["dashboard_id", "card_id", "export_format"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id || !args.card_id || !args.export_format) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID, Card ID, and export format are required");
-      }
-    },
-    handler: async (client, args) => {
-      const { dashboard_id, card_id, export_format, parameters = {} } = args;
-      const result = await client.apiCall("POST", `/api/dashboard/${dashboard_id}/card/${card_id}/query/${export_format}`, { parameters });
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  get_dashboard_param_remapping: {
-    name: "get_dashboard_param_remapping",
-    description: "Fetch the remapped value for a given value of the parameter with ID :param-key",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-        param_key: {
-          type: "string",
-          description: "Parameter key",
-        },
-        value: {
-          type: "string",
-          description: "Value to remap",
-        },
-      },
-      required: ["dashboard_id", "param_key", "value"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id || !args.param_key || !args.value) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID, parameter key, and value are required");
-      }
-    },
-    handler: async (client, args) => {
-      const result = await client.apiCall("GET", `/api/dashboard/${args.dashboard_id}/params/${args.param_key}/remapping/${args.value}`);
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  get_dashboard_param_search: {
-    name: "get_dashboard_param_search",
-    description: "Fetch possible values of the parameter whose ID is :param-key that contain :query. Optionally restrict values by passing query parameters like other-parameter=value",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-        param_key: {
-          type: "string",
-          description: "Parameter key",
-        },
-        query: {
-          type: "string",
-          description: "Search query",
-        },
-      },
-      required: ["dashboard_id", "param_key", "query"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id || !args.param_key || !args.query) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID, parameter key, and query are required");
-      }
-    },
-    handler: async (client, args) => {
-      const result = await client.apiCall("GET", `/api/dashboard/${args.dashboard_id}/params/${args.param_key}/search/${args.query}`);
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  get_dashboard_param_values: {
-    name: "get_dashboard_param_values",
-    description: "Fetch possible values of the parameter whose ID is :param-key. Optionally restrict values by passing query parameters like other-parameter=value",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-        param_key: {
-          type: "string",
-          description: "Parameter key",
-        },
-      },
-      required: ["dashboard_id", "param_key"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id || !args.param_key) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID and parameter key are required");
-      }
-    },
-    handler: async (client, args) => {
-      const result = await client.apiCall("GET", `/api/dashboard/${args.dashboard_id}/params/${args.param_key}/values`);
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  get_dashboard_query_metadata: {
-    name: "get_dashboard_query_metadata",
-    description: "Get query metadata for a dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-      },
-      required: ["dashboard_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID is required");
-      }
-    },
-    handler: async (client, args) => {
-      const result = await client.apiCall("GET", `/api/dashboard/${args.dashboard_id}/query_metadata`);
-      return defaultResponseFormatter(result);
-    }
-  },
-
-  get_dashboard_related: {
+  // GET /api/dashboard/:id/related - Get related entities
+  server.addTool({
     name: "get_dashboard_related",
-    description: "Get related items for a dashboard",
-    inputSchema: {
-      type: "object",
-      properties: {
-        dashboard_id: {
-          type: "number",
-          description: "ID of the dashboard",
-        },
-      },
-      required: ["dashboard_id"],
-    },
-    validate: (args) => {
-      if (!args.dashboard_id) {
-        throw new McpError(ErrorCode.InvalidParams, "Dashboard ID is required");
+    description: "Return related entities for a dashboard",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard"),
+    }),
+    execute: async (args: { dashboard_id: number }) => {
+      try {
+        const result = await metabaseClient.apiCall('GET', `/api/dashboard/${args.dashboard_id}/related`);
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to fetch related entities for dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     },
-    handler: async (client, args) => {
-      const result = await client.apiCall("GET", `/api/dashboard/${args.dashboard_id}/related`);
-      return defaultResponseFormatter(result);
-    }
-  }
-};
+  });
+
+  // GET /api/dashboard/:id/revisions - Get dashboard revisions
+  server.addTool({
+    name: "get_dashboard_revisions",
+    description: "Fetch revisions for dashboard with ID",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard"),
+    }),
+    execute: async (args: { dashboard_id: number }) => {
+      try {
+        const result = await metabaseClient.apiCall('GET', `/api/dashboard/${args.dashboard_id}/revisions`);
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to fetch revisions for dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // GET /api/dashboard/embeddable - List embeddable dashboards
+  server.addTool({
+    name: "list_embeddable_dashboards",
+    description: "Fetch a list of dashboards where enable_embedding is true (requires superuser)",
+    execute: async () => {
+      try {
+        const dashboards = await metabaseClient.apiCall('GET', '/api/dashboard/embeddable');
+        return JSON.stringify(dashboards, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to fetch embeddable dashboards: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // GET /api/dashboard/public - List public dashboards
+  server.addTool({
+    name: "list_public_dashboards",
+    description: "Fetch a list of dashboards with public UUIDs (requires superuser)",
+    execute: async () => {
+      try {
+        const dashboards = await metabaseClient.apiCall('GET', '/api/dashboard/public');
+        return JSON.stringify(dashboards, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to fetch public dashboards: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // POST /api/dashboard/ - Create a new dashboard
+  server.addTool({
+    name: "create_dashboard",
+    description: "Create a new Dashboard",
+    parameters: z.object({
+      name: z.string().describe("Name of the dashboard (required)"),
+      description: z.string().optional().describe("Description of the dashboard"),
+      parameters: z.array(z.object({})).optional().describe("Dashboard parameters array"),
+      collection_id: z.number().optional().describe("Collection ID to save dashboard in"),
+      collection_position: z.number().optional().describe("Position within the collection"),
+    }),
+    execute: async (args: { name: string; description?: string; parameters?: any[]; collection_id?: number; collection_position?: number }) => {
+      try {
+        const dashboard = await metabaseClient.createDashboard(args);
+        return JSON.stringify(dashboard, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to create dashboard: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // POST /api/dashboard/:dashboard-id/public_link - Create public link
+  server.addTool({
+    name: "create_public_link",
+    description: "Generate publicly-accessible links for this dashboard (requires superuser)",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard"),
+    }),
+    execute: async (args: { dashboard_id: number }) => {
+      try {
+        const result = await metabaseClient.apiCall('POST', `/api/dashboard/${args.dashboard_id}/public_link`);
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to create public link for dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // POST /api/dashboard/:from-dashboard-id/copy - Copy dashboard
+  server.addTool({
+    name: "copy_dashboard",
+    description: "Copy a Dashboard",
+    parameters: z.object({
+      from_dashboard_id: z.number().describe("The ID of the dashboard to copy"),
+      name: z.string().optional().describe("Name for the new dashboard copy"),
+      description: z.string().optional().describe("Description for the new dashboard copy"),
+      collection_id: z.number().optional().describe("Collection ID for the new dashboard"),
+      collection_position: z.number().optional().describe("Position within the collection"),
+    }),
+    execute: async (args: { from_dashboard_id: number; name?: string; description?: string; collection_id?: number; collection_position?: number }) => {
+      try {
+        const { from_dashboard_id, ...copyData } = args;
+        const dashboard = await metabaseClient.apiCall('POST', `/api/dashboard/${from_dashboard_id}/copy`, copyData);
+        return JSON.stringify(dashboard, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to copy dashboard ${args.from_dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // POST /api/dashboard/:id/cards - Add card to dashboard
+  server.addTool({
+    name: "add_card_to_dashboard",
+    description: "Add a Card to a Dashboard",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard"),
+      cardId: z.number().optional().describe("The ID of the card to add"),
+      parameter_mappings: z.array(z.object({})).optional().describe("Parameter mappings for the card"),
+      series: z.array(z.object({})).optional().describe("Series data for the card"),
+    }),
+    execute: async (args: { dashboard_id: number; cardId?: number; parameter_mappings?: any[]; series?: any[] }) => {
+      try {
+        const { dashboard_id, ...cardData } = args;
+        const result = await metabaseClient.apiCall('POST', `/api/dashboard/${dashboard_id}/cards`, cardData);
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to add card to dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // POST /api/dashboard/:id/favorite - Favorite dashboard
+  server.addTool({
+    name: "favorite_dashboard",
+    description: "Favorite a Dashboard",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard"),
+    }),
+    execute: async (args: { dashboard_id: number }) => {
+      try {
+        const result = await metabaseClient.apiCall('POST', `/api/dashboard/${args.dashboard_id}/favorite`);
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to favorite dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // POST /api/dashboard/:id/revert - Revert dashboard to revision
+  server.addTool({
+    name: "revert_dashboard",
+    description: "Revert a Dashboard to a prior Revision",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard"),
+      revision_id: z.number().describe("The revision ID to revert to"),
+    }),
+    execute: async (args: { dashboard_id: number; revision_id: number }) => {
+      try {
+        const result = await metabaseClient.apiCall('POST', `/api/dashboard/${args.dashboard_id}/revert`, {
+          revision_id: args.revision_id
+        });
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to revert dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // POST /api/dashboard/save - Save denormalized dashboard
+  server.addTool({
+    name: "save_dashboard",
+    description: "Save a denormalized description of dashboard",
+    parameters: z.object({
+      dashboard: z.object({}).describe("Dashboard object to save"),
+    }),
+    execute: async (args: { dashboard: any }) => {
+      try {
+        const result = await metabaseClient.apiCall('POST', '/api/dashboard/save', args.dashboard);
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to save dashboard: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // POST /api/dashboard/save/collection/:parent-collection-id - Save dashboard to collection
+  server.addTool({
+    name: "save_dashboard_to_collection",
+    description: "Save a denormalized description of dashboard into collection",
+    parameters: z.object({
+      parent_collection_id: z.number().describe("The parent collection ID"),
+      dashboard: z.object({}).describe("Dashboard object to save"),
+    }),
+    execute: async (args: { parent_collection_id: number; dashboard: any }) => {
+      try {
+        const result = await metabaseClient.apiCall('POST', `/api/dashboard/save/collection/${args.parent_collection_id}`, args.dashboard);
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to save dashboard to collection ${args.parent_collection_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // PUT /api/dashboard/:id - Update dashboard
+  server.addTool({
+    name: "update_dashboard",
+    description: "Update a Dashboard",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard to update"),
+      name: z.string().optional().describe("New name for the dashboard"),
+      description: z.string().optional().describe("New description for the dashboard"),
+      parameters: z.array(z.object({})).optional().describe("Dashboard parameters"),
+      points_of_interest: z.string().optional().describe("Points of interest"),
+      archived: z.boolean().optional().describe("Whether to archive the dashboard"),
+      collection_position: z.number().optional().describe("Position within the collection"),
+      show_in_getting_started: z.boolean().optional().describe("Show in getting started"),
+      enable_embedding: z.boolean().optional().describe("Enable embedding (requires superuser)"),
+      collection_id: z.number().optional().describe("Collection ID to move dashboard to"),
+      caveats: z.string().optional().describe("Dashboard caveats"),
+      embedding_params: z.object({}).optional().describe("Embedding parameters"),
+      position: z.number().optional().describe("Dashboard position"),
+    }),
+    execute: async (args: { dashboard_id: number; [key: string]: any }) => {
+      try {
+        const { dashboard_id, ...updates } = args;
+        const dashboard = await metabaseClient.updateDashboard(dashboard_id, updates);
+        return JSON.stringify(dashboard, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to update dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // PUT /api/dashboard/:id/cards - Update dashboard cards
+  server.addTool({
+    name: "update_dashboard_cards",
+    description: "Update Cards on a Dashboard",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard"),
+      cards: z.array(z.object({
+        id: z.number().describe("Card ID"),
+        sizeX: z.number().optional().describe("Width of the card"),
+        sizeY: z.number().optional().describe("Height of the card"),
+        row: z.number().optional().describe("Row position"),
+        col: z.number().optional().describe("Column position"),
+        series: z.array(z.object({})).optional().describe("Series data"),
+      })).describe("Array of card configurations"),
+    }),
+    execute: async (args: { dashboard_id: number; cards: any[] }) => {
+      try {
+        const result = await metabaseClient.apiCall('PUT', `/api/dashboard/${args.dashboard_id}/cards`, { cards: args.cards });
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to update cards on dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // DELETE /api/dashboard/:id - Delete dashboard
+  server.addTool({
+    name: "delete_dashboard",
+    description: "Delete or archive a dashboard",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard to delete"),
+      hard_delete: z.boolean().optional().default(false).describe("Whether to permanently delete (true) or archive (false)"),
+    }),
+    execute: async (args: { dashboard_id: number; hard_delete?: boolean }) => {
+      try {
+        await metabaseClient.deleteDashboard(args.dashboard_id, args.hard_delete || false);
+        return JSON.stringify({
+          dashboard_id: args.dashboard_id,
+          action: args.hard_delete ? "deleted" : "archived",
+          status: "success"
+        }, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to delete dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // DELETE /api/dashboard/:dashboard-id/public_link - Delete public link
+  server.addTool({
+    name: "delete_public_link",
+    description: "Delete the public link for a dashboard (requires superuser)",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard"),
+    }),
+    execute: async (args: { dashboard_id: number }) => {
+      try {
+        await metabaseClient.apiCall('DELETE', `/api/dashboard/${args.dashboard_id}/public_link`);
+        return JSON.stringify({
+          dashboard_id: args.dashboard_id,
+          action: "public_link_deleted",
+          status: "success"
+        }, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to delete public link for dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // DELETE /api/dashboard/:id/cards - Remove cards from dashboard
+  server.addTool({
+    name: "remove_cards_from_dashboard",
+    description: "Remove cards from a dashboard",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard"),
+      card_ids: z.array(z.number()).describe("Array of card IDs to remove"),
+    }),
+    execute: async (args: { dashboard_id: number; card_ids: number[] }) => {
+      try {
+        const result = await metabaseClient.apiCall('DELETE', `/api/dashboard/${args.dashboard_id}/cards`, {
+          card_ids: args.card_ids
+        });
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to remove cards from dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // DELETE /api/dashboard/:id/favorite - Unfavorite dashboard
+  server.addTool({
+    name: "unfavorite_dashboard",
+    description: "Unfavorite a Dashboard",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard"),
+    }),
+    execute: async (args: { dashboard_id: number }) => {
+      try {
+        const result = await metabaseClient.apiCall('DELETE', `/api/dashboard/${args.dashboard_id}/favorite`);
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to unfavorite dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // Additional utility tool - Execute dashboard card
+  server.addTool({
+    name: "execute_dashboard_card",
+    description: "Execute a specific card from a dashboard and get results",
+    parameters: z.object({
+      dashboard_id: z.number().describe("The ID of the dashboard containing the card"),
+      card_id: z.number().describe("The ID of the card to execute"),
+    }),
+    execute: async (args: { dashboard_id: number; card_id: number }) => {
+      try {
+        const result = await metabaseClient.executeCard(args.card_id);
+        return JSON.stringify({
+          dashboard_id: args.dashboard_id,
+          card_id: args.card_id,
+          status: "completed",
+          data: result
+        }, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to execute card ${args.card_id} from dashboard ${args.dashboard_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  // Additional utility tool - Search dashboards
+  server.addTool({
+    name: "search_dashboards",
+    description: "Search dashboards by name or description",
+    parameters: z.object({
+      query: z.string().describe("Search query string"),
+      limit: z.number().optional().describe("Maximum number of results to return"),
+    }),
+    execute: async (args: { query: string; limit?: number }) => {
+      try {
+        const dashboards = await metabaseClient.getDashboards();
+        const filtered = dashboards.filter(d => 
+          d.name?.toLowerCase().includes(args.query.toLowerCase()) ||
+          d.description?.toLowerCase().includes(args.query.toLowerCase())
+        );
+        
+        const results = args.limit ? filtered.slice(0, args.limit) : filtered;
+        return JSON.stringify(results, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to search dashboards: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+}
