@@ -3,11 +3,11 @@
 import { FastMCP } from "fastmcp";
 import { MetabaseClient } from "./client/metabase-client.js";
 import { loadConfig, validateConfig } from "./utils/config.js";
-import { addDashboardTools } from "./tools/fastmcp-dashboard-tools.js";
-import { addDatabaseTools } from "./tools/fastmcp-database-tools.js";
-import { addCardTools } from "./tools/fastmcp-card-tools.js";
-import { addTableTools } from "./tools/fastmcp-table-tools.js";
-import { addAdditionalTools } from "./tools/fastmcp-additional-tools.js";
+import { addDashboardTools } from "./tools/dashboard-tools.js";
+import { addDatabaseTools } from "./tools/database-tools.js";
+import { addCardTools } from "./tools/card-tools.js";
+import { addTableTools } from "./tools/table-tools.js";
+import { addAdditionalTools } from "./tools/additional-tools.js";
 
 // Load and validate configuration
 const config = loadConfig();
@@ -36,6 +36,7 @@ addTableTools(server, metabaseClient);
 
 // Add additional tools (collections/search/move)
 addAdditionalTools(server, metabaseClient);
+
 // Start the server
 server.start({
   transportType: "stdio",
