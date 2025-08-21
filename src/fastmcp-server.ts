@@ -4,6 +4,7 @@ import { FastMCP } from "fastmcp";
 import { MetabaseClient } from "./client/metabase-client.js";
 import { loadConfig, validateConfig } from "./utils/config.js";
 import { addDashboardTools } from "./tools/fastmcp-dashboard-tools.js";
+import { addDatabaseTools } from "./tools/fastmcp-database-tools.js";
 
 // Load and validate configuration
 const config = loadConfig();
@@ -21,9 +22,12 @@ const server = new FastMCP({
 // Add all dashboard tools
 addDashboardTools(server, metabaseClient);
 
+// Add all database tools
+addDatabaseTools(server, metabaseClient);
+
 // Start the server
 server.start({
   transportType: "stdio",
 });
 
-console.error("FastMCP Metabase server started with dashboard tools");
+console.error("FastMCP Metabase server started with dashboard and database tools");
