@@ -376,6 +376,65 @@ export class MetabaseClient {
     return response.data;
   }
 
+  async createDatabase(payload: any): Promise<Database> {
+    await this.ensureAuthenticated();
+    const response = await this.axiosInstance.post("/api/database", payload);
+    return response.data;
+  }
+
+  async updateDatabase(id: number, updates: any): Promise<Database> {
+    await this.ensureAuthenticated();
+    const response = await this.axiosInstance.put(`/api/database/${id}`, updates);
+    return response.data;
+  }
+
+  async deleteDatabase(id: number): Promise<void> {
+    await this.ensureAuthenticated();
+    await this.axiosInstance.delete(`/api/database/${id}`);
+  }
+
+  async validateDatabase(engine: string, details: any): Promise<any> {
+    await this.ensureAuthenticated();
+    const response = await this.axiosInstance.post(`/api/database/validate`, { engine, details });
+    return response.data;
+  }
+
+  async addSampleDatabase(): Promise<Database> {
+    await this.ensureAuthenticated();
+    const response = await this.axiosInstance.post(`/api/database/sample_database`);
+    return response.data;
+  }
+
+  async checkDatabaseHealth(id: number): Promise<any> {
+    await this.ensureAuthenticated();
+    const response = await this.axiosInstance.get(`/api/database/${id}/healthcheck`);
+    return response.data;
+  }
+
+  async getDatabaseMetadata(id: number): Promise<any> {
+    await this.ensureAuthenticated();
+    const response = await this.axiosInstance.get(`/api/database/${id}/metadata`);
+    return response.data;
+  }
+
+  async getDatabaseSchemas(id: number): Promise<any> {
+    await this.ensureAuthenticated();
+    const response = await this.axiosInstance.get(`/api/database/${id}/schemas`);
+    return response.data;
+  }
+
+  async getDatabaseSchema(id: number, schema: string): Promise<any> {
+    await this.ensureAuthenticated();
+    const response = await this.axiosInstance.get(`/api/database/${id}/schema/${encodeURIComponent(schema)}`);
+    return response.data;
+  }
+
+  async syncDatabaseSchema(id: number): Promise<any> {
+    await this.ensureAuthenticated();
+    const response = await this.axiosInstance.post(`/api/database/${id}/sync_schema`);
+    return response.data;
+  }
+
   async executeQuery(
     databaseId: number,
     query: string,

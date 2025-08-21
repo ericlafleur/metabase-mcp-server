@@ -53,7 +53,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     }),
     execute: async (args: { engine: string; name: string; details: any; is_full_sync?: boolean; is_on_demand?: boolean; schedules?: any }) => {
       try {
-        const database = await metabaseClient.apiCall('POST', '/api/database', args);
+        const database = await metabaseClient.createDatabase(args);
         return JSON.stringify(database, null, 2);
       } catch (error) {
         throw new Error(`Failed to create database: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -77,7 +77,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     execute: async (args: { database_id: number; [key: string]: any }) => {
       try {
         const { database_id, ...updates } = args;
-        const database = await metabaseClient.apiCall('PUT', `/api/database/${database_id}`, updates);
+        const database = await metabaseClient.updateDatabase(database_id, updates);
         return JSON.stringify(database, null, 2);
       } catch (error) {
         throw new Error(`Failed to update database ${args.database_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -94,7 +94,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     }),
     execute: async (args: { database_id: number }) => {
       try {
-        await metabaseClient.apiCall('DELETE', `/api/database/${args.database_id}`);
+        await metabaseClient.deleteDatabase(args.database_id);
         return JSON.stringify({
           database_id: args.database_id,
           action: "deleted",
@@ -122,7 +122,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     }),
     execute: async (args: { engine: string; details: any }) => {
       try {
-        const result = await metabaseClient.apiCall('POST', '/api/database/validate', args);
+        const result = await metabaseClient.validateDatabase(args.engine, args.details);
         return JSON.stringify(result, null, 2);
       } catch (error) {
         throw new Error(`Failed to validate database connection: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -136,7 +136,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     description: "Add the Metabase sample database to your instance",
     execute: async () => {
       try {
-        const database = await metabaseClient.apiCall('POST', '/api/database/sample_database');
+        const database = await metabaseClient.addSampleDatabase();
         return JSON.stringify(database, null, 2);
       } catch (error) {
         throw new Error(`Failed to add sample database: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -153,7 +153,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     }),
     execute: async (args: { database_id: number }) => {
       try {
-        const result = await metabaseClient.apiCall('GET', `/api/database/${args.database_id}/healthcheck`);
+        const result = await metabaseClient.checkDatabaseHealth(args.database_id);
         return JSON.stringify(result, null, 2);
       } catch (error) {
         throw new Error(`Failed to check database health for ${args.database_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -170,7 +170,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     }),
     execute: async (args: { database_id: number }) => {
       try {
-        const metadata = await metabaseClient.apiCall('GET', `/api/database/${args.database_id}/metadata`);
+        const metadata = await metabaseClient.getDatabaseMetadata(args.database_id);
         return JSON.stringify(metadata, null, 2);
       } catch (error) {
         throw new Error(`Failed to fetch metadata for database ${args.database_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -187,7 +187,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     }),
     execute: async (args: { database_id: number }) => {
       try {
-        const schemas = await metabaseClient.apiCall('GET', `/api/database/${args.database_id}/schemas`);
+        const schemas = await metabaseClient.getDatabaseSchemas(args.database_id);
         return JSON.stringify(schemas, null, 2);
       } catch (error) {
         throw new Error(`Failed to fetch schemas for database ${args.database_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -205,7 +205,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     }),
     execute: async (args: { database_id: number; schema_name: string }) => {
       try {
-        const schema = await metabaseClient.apiCall('GET', `/api/database/${args.database_id}/schema/${encodeURIComponent(args.schema_name)}`);
+        const schema = await metabaseClient.getDatabaseSchema(args.database_id, args.schema_name);
         return JSON.stringify(schema, null, 2);
       } catch (error) {
         throw new Error(`Failed to fetch schema ${args.schema_name} for database ${args.database_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -222,7 +222,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     }),
     execute: async (args: { database_id: number }) => {
       try {
-        const result = await metabaseClient.apiCall('POST', `/api/database/${args.database_id}/sync_schema`);
+        const result = await metabaseClient.syncDatabaseSchema(args.database_id);
         return JSON.stringify({
           database_id: args.database_id,
           action: "schema_sync_triggered",
