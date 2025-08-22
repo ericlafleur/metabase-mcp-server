@@ -1,4 +1,4 @@
-# Placeholder Readme: Metabase MCP Server
+# Readme: Metabase MCP Server
 
 [![npm version](https://badge.fury.io/js/%40windsurf-public%2Fmcp-metabase-server.svg)](https://badge.fury.io/js/%40windsurf-public%2Fmcp-metabase-server)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
