@@ -2,10 +2,19 @@ import { z } from "zod";
 import { MetabaseClient } from "../client/metabase-client.js";
 
 export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
-  // GET /api/database - List all databases
+
+  /**
+   * List all available databases
+   * 
+   * Retrieves all database connections configured in Metabase. Use this to discover
+   * available data sources, check connection status, or get an overview of all
+   * connected databases.
+   * 
+   * @returns {Promise<string>} JSON string of databases array
+   */
   server.addTool({
     name: "list_databases",
-    description: "Get all databases from Metabase",
+    description: "Retrieve all database connections in Metabase - use this to discover available data sources, check connection status, or get an overview of connected databases",
     execute: async () => {
       try {
         const databases = await metabaseClient.getDatabases();
@@ -16,10 +25,19 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/database/{id} - Get specific database details
+  /**
+   * Get detailed information about a specific database
+   * 
+   * Retrieves complete database metadata including connection details, schema
+   * information, and configuration settings. Use this to examine database
+   * properties, troubleshoot connections, or understand data source structure.
+   * 
+   * @param {number} database_id - The ID of the database to retrieve
+   * @returns {Promise<string>} JSON string of database object with full metadata
+   */
   server.addTool({
     name: "get_database",
-    description: "Get specific database details by ID",
+    description: "Retrieve detailed information about a specific Metabase database including connection details and schema - use this to examine database properties or troubleshoot connections",
     parameters: z.object({
       database_id: z.number().describe("The ID of the database to retrieve"),
     }),
@@ -33,10 +51,22 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/database - Create/add new database
+  /**
+   * Create a new database connection
+   * 
+   * Adds a new database connection to Metabase with specified engine type,
+   * connection details, and sync settings. Use this to connect new data sources,
+   * establish analytical pipelines, or expand data access.
+   * 
+   * @param {string} engine - Database engine type (postgres, mysql, etc.)
+   * @param {string} name - Display name for the database
+   * @param {object} details - Database connection details (host, port, credentials)
+   * @param {boolean} [is_full_sync] - Whether to perform full sync
+   * @returns {Promise<string>} JSON string of created database object
+   */
   server.addTool({
     name: "create_database",
-    description: "Add a new database connection to Metabase",
+    description: "Add a new database connection to Metabase - use this to connect new data sources, establish analytical pipelines, or expand data access",
     parameters: z.object({
       engine: z.string().describe("Database engine type (e.g., postgres, mysql, redshift)"),
       name: z.string().describe("Display name for the database"),
@@ -61,10 +91,25 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // PUT /api/database/{id} - Update database configuration
+  /**
+   * Update database configuration and settings
+   * 
+   * Modifies database properties including name, connection details, sync schedules,
+   * and operational settings. Use this to maintain database connections, update
+   * credentials, or modify sync behavior for data freshness.
+   * 
+   * @param {number} database_id - The ID of the database to update
+   * @param {string} [name] - New display name for the database
+   * @param {string} [engine] - Database engine type (postgres, mysql, etc.)
+   * @param {Object} [details] - Updated database connection details
+   * @param {boolean} [is_full_sync] - Whether to perform full sync
+   * @param {boolean} [is_on_demand] - Whether database is on-demand
+   * @param {Object} [schedules] - Updated sync schedules
+   * @returns {Promise<string>} JSON string of the updated database object
+   */
   server.addTool({
     name: "update_database",
-    description: "Update database configuration",
+    description: "Update database configuration including name, connection details, and sync settings - use this to maintain connections, update credentials, or modify sync behavior",
     parameters: z.object({
       database_id: z.number().describe("The ID of the database to update"),
       name: z.string().optional().describe("New display name for the database"),
@@ -85,10 +130,19 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // DELETE /api/database/{id} - Remove database
+  /**
+   * Remove a database from Metabase
+   * 
+   * Permanently removes a database connection from Metabase, including all
+   * associated metadata, questions, and dashboards. This action cannot be undone.
+   * Use with caution as it will break any content dependent on this database.
+   * 
+   * @param {number} database_id - The ID of the database to delete
+   * @returns {Promise<string>} JSON string confirming deletion status
+   */
   server.addTool({
     name: "delete_database",
-    description: "Remove a database from Metabase",
+    description: "Permanently remove a database from Metabase - use with caution as this will break dependent content and cannot be undone",
     parameters: z.object({
       database_id: z.number().describe("The ID of the database to delete"),
     }),
@@ -106,10 +160,25 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/database/validate - Validate database connection
+  /**
+   * Validate database connection details
+   * 
+   * Tests database connection parameters without creating a permanent connection.
+   * Use this to verify credentials, network connectivity, and database accessibility
+   * before adding a database to Metabase.
+   * 
+   * @param {string} engine - Database engine type (postgres, mysql, redshift, etc.)
+   * @param {Object} details - Database connection details to validate
+   * @param {string} details.host - Database host address
+   * @param {string|number} details.port - Database port number
+   * @param {string} details.db - Database name
+   * @param {string} details.user - Database username
+   * @param {string} details.password - Database password
+   * @returns {Promise<string>} JSON string with validation results
+   */
   server.addTool({
     name: "validate_database",
-    description: "Validate database connection details before creating",
+    description: "Test database connection parameters before creating - use this to verify credentials, connectivity, and accessibility",
     parameters: z.object({
       engine: z.string().describe("Database engine type (e.g., postgres, mysql, redshift)"),
       details: z.object({
@@ -130,10 +199,18 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/database/sample_database - Add sample database
+  /**
+   * Add Metabase sample database
+   * 
+   * Adds the built-in Metabase sample database with demo data for testing
+   * and learning purposes. The sample database contains example tables
+   * and data that can be used to explore Metabase features.
+   * 
+   * @returns {Promise<string>} JSON string of the created sample database
+   */
   server.addTool({
     name: "add_sample_database",
-    description: "Add the Metabase sample database to your instance",
+    description: "Add the built-in Metabase sample database with demo data - use this for testing, learning, or exploring Metabase features",
     execute: async () => {
       try {
         const database = await metabaseClient.addSampleDatabase();
@@ -144,10 +221,19 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/database/{id}/healthcheck - Check database health
+  /**
+   * Check database health and connectivity
+   * 
+   * Performs a health check on a database connection to verify it's accessible
+   * and responding properly. Use this to diagnose connection issues, monitor
+   * database status, or troubleshoot sync problems.
+   * 
+   * @param {number} database_id - The ID of the database to check
+   * @returns {Promise<string>} JSON string with health check results
+   */
   server.addTool({
     name: "check_database_health",
-    description: "Check the health/connectivity of a database",
+    description: "Perform health check on database connection - use this to diagnose issues, monitor status, or troubleshoot sync problems",
     parameters: z.object({
       database_id: z.number().describe("The ID of the database to check"),
     }),
@@ -161,10 +247,19 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/database/{id}/metadata - Get database metadata
+  /**
+   * Get complete database metadata
+   * 
+   * Retrieves comprehensive metadata for a database including all tables,
+   * fields, data types, and relationships. Use this to understand database
+   * structure, explore available data, or build dynamic queries.
+   * 
+   * @param {number} database_id - The ID of the database
+   * @returns {Promise<string>} JSON string with complete database metadata
+   */
   server.addTool({
     name: "get_database_metadata",
-    description: "Get complete metadata for a database including tables and fields",
+    description: "Retrieve comprehensive database metadata including tables, fields, and relationships - use this to understand structure or build dynamic queries",
     parameters: z.object({
       database_id: z.number().describe("The ID of the database"),
     }),
@@ -178,10 +273,19 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/database/{id}/schemas - List all schemas in database
+  /**
+   * List all schemas in a database
+   * 
+   * Retrieves all schema names available in a database. Schemas are logical
+   * groupings of tables and other database objects. Use this to explore
+   * database organization or navigate multi-schema databases.
+   * 
+   * @param {number} database_id - The ID of the database
+   * @returns {Promise<string>} JSON string of schema names array
+   */
   server.addTool({
     name: "list_database_schemas",
-    description: "List all schemas in a database",
+    description: "Retrieve all schema names in a database - use this to explore database organization or navigate multi-schema databases",
     parameters: z.object({
       database_id: z.number().describe("The ID of the database"),
     }),
@@ -195,10 +299,20 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/database/{id}/schema/{schema} - Get specific schema details
+  /**
+   * Get specific schema details
+   * 
+   * Retrieves detailed information about a specific schema including all
+   * tables, views, and other objects within that schema. Use this to explore
+   * schema contents or understand table organization within a schema.
+   * 
+   * @param {number} database_id - The ID of the database
+   * @param {string} schema_name - The name of the schema to examine
+   * @returns {Promise<string>} JSON string with schema details and contents
+   */
   server.addTool({
     name: "get_database_schema",
-    description: "Get details of a specific schema in a database",
+    description: "Retrieve detailed information about a specific schema including tables and objects - use this to explore schema contents or understand organization",
     parameters: z.object({
       database_id: z.number().describe("The ID of the database"),
       schema_name: z.string().describe("The name of the schema"),
@@ -213,10 +327,19 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/database/{id}/sync_schema - Trigger schema sync
+  /**
+   * Trigger database schema synchronization
+   * 
+   * Initiates a schema sync to update Metabase's metadata cache with the latest
+   * database structure. Use this when database schema changes have been made
+   * and you need Metabase to recognize new tables, columns, or relationships.
+   * 
+   * @param {number} database_id - The ID of the database to sync
+   * @returns {Promise<string>} JSON string confirming sync initiation and status
+   */
   server.addTool({
     name: "sync_database_schema",
-    description: "Trigger a schema sync for a database to update metadata",
+    description: "Initiate schema sync to update Metabase metadata cache - use this after database changes to recognize new tables, columns, or relationships",
     parameters: z.object({
       database_id: z.number().describe("The ID of the database to sync"),
     }),

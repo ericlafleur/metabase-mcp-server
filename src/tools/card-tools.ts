@@ -2,10 +2,21 @@ import { z } from "zod";
 import { MetabaseClient } from "../client/metabase-client.js";
 
 export function addCardTools(server: any, metabaseClient: MetabaseClient) {
-  // GET /api/card - List cards
+
+  /**
+   * List all available Metabase cards
+   * 
+   * Retrieves all cards with optional filtering by source type (e.g., 'models') or model
+   * relationships. Use this to discover available cards, find specific cards by type,
+   * or get an overview of analytical content.
+   * 
+   * @param {string} [f] - Filter by source (e.g., 'models')
+   * @param {number} [model_id] - Filter by model_id
+   * @returns {Promise<string>} JSON string of cards array
+   */
   server.addTool({
     name: "list_cards",
-    description: "List cards with optional filters",
+    description: "Retrieve all Metabase cards with optional filtering by source type (e.g., 'models') or model relationships - use this to discover available cards, find specific cards by type, or get an overview of all analytical content",
     parameters: z.object({
       f: z.string().optional().describe("Filter by source (e.g., 'models')"),
       model_id: z.number().optional().describe("Filter by model_id"),
@@ -22,10 +33,19 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/card/{id} - Get card
+  /**
+   * Get detailed information about a specific card
+   * 
+   * Retrieves complete metadata and configuration for a specific Metabase card
+   * including query definition, visualization settings, collection location, and permissions.
+   * Use this when you need to examine or understand how a particular card is built.
+   * 
+   * @param {number} card_id - The ID of the card to retrieve
+   * @returns {Promise<string>} JSON string of card object with full metadata
+   */
   server.addTool({
     name: "get_card",
-    description: "Get a card by ID",
+    description: "Get complete metadata and configuration for a specific Metabase card including query definition, visualization settings, collection location, and permissions - use this when you need to examine or understand how a particular card is built",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
     }),
@@ -41,10 +61,24 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/card - Create card
+  /**
+   * Create a new Metabase card
+   * 
+   * Creates a new card with custom query, visualization type,
+   * and settings. Use this to programmatically build new analytical cards,
+   * dashboard charts, or data exploration queries.
+   * 
+   * @param {string} name - Card name
+   * @param {string} [description] - Optional description
+   * @param {object} [dataset_query] - Dataset query object
+   * @param {string} [display] - Visualization type
+   * @param {object} [visualization_settings] - Chart-specific settings
+   * @param {number} [collection_id] - Collection to save the card in
+   * @returns {Promise<string>} JSON string of created card object
+   */
   server.addTool({
     name: "create_card",
-    description: "Create a new card (question)",
+    description: "Create a new Metabase card with custom query, visualization type, and settings - use this to programmatically build new analytical cards, dashboards charts, or data exploration queries",
     parameters: z
       .object({
         name: z.string().describe("Card name"),
@@ -70,10 +104,21 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // PUT /api/card/{id} - Update card
+  /**
+   * Update an existing Metabase card
+   * 
+   * Modifies an existing card's name, description, query definition, visualization type,
+   * or settings. Use this to fix broken cards, change chart types, update queries,
+   * or move cards between collections.
+   * 
+   * @param {number} card_id - The ID of the card to update
+   * @param {object} updates - Object containing fields to update
+   * @param {object} [query_params] - Optional query parameters for update
+   * @returns {Promise<string>} JSON string of updated card object
+   */
   server.addTool({
     name: "update_card",
-    description: "Update an existing card",
+    description: "Modify an existing Metabase card's name, description, query definition, visualization type, or settings - use this to fix broken cards, change chart types, update queries, or move cards between collections",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       updates: z.object({}).describe("Fields to update"),
@@ -102,10 +147,19 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // DELETE /api/card/{id} - Delete/archive card
+  /**
+   * Delete or archive a Metabase card
+   * 
+   * Removes a card either by archiving (soft delete, preserves history) or permanent deletion.
+   * Use this to clean up unused cards, remove broken cards, or organize analytical content.
+   * 
+   * @param {number} card_id - The ID of the card to delete
+   * @param {boolean} [hard_delete=false] - If true, permanently delete; otherwise archive
+   * @returns {Promise<string>} JSON string confirming deletion
+   */
   server.addTool({
     name: "delete_card",
-    description: "Delete (hard) or archive (soft) a card",
+    description: "Remove a Metabase card either by archiving (soft delete, preserves history) or permanent deletion - use this to clean up unused cards, remove broken cards, or organize analytical content",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       hard_delete: z
@@ -134,10 +188,23 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/card/{id}/query - Execute card
+  /**
+   * Execute a Metabase card query
+   * 
+   * Runs a card query and returns the actual data results. Use this to get current data
+   * from existing cards, refresh analytical insights, or programmatically access
+   * query results for further processing.
+   * 
+   * @param {number} card_id - The ID of the card to execute
+   * @param {boolean} [ignore_cache] - Whether to ignore cached results
+   * @param {boolean} [collection_preview] - Collection preview flag
+   * @param {number} [dashboard_id] - Dashboard ID if executing from dashboard context
+   * @param {object} [parameters] - Query parameters
+   * @returns {Promise<string>} JSON string of query results
+   */
   server.addTool({
     name: "execute_card",
-    description: "Execute a card and return results",
+    description: "Run a Metabase card query and return the actual data results - use this to get current data from existing cards, refresh analytical insights, or programmatically access query results for further processing",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       ignore_cache: z.boolean().optional().describe("Ignore cached results"),
@@ -171,10 +238,21 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/card/{id}/query/{export-format} - Execute & export
+  /**
+   * Export Metabase card results in specific format
+   * 
+   * Executes a card and exports the results in a specific format (CSV, Excel, JSON, etc.).
+   * Use this to download data for external analysis, create reports for stakeholders,
+   * or integrate query results with other systems.
+   * 
+   * @param {number} card_id - The ID of the card to export
+   * @param {string} export_format - Export format (csv, xlsx, json, etc.)
+   * @param {object} [parameters] - Query execution parameters
+   * @returns {Promise<string>} Exported data in requested format
+   */
   server.addTool({
     name: "export_card_result",
-    description: "Execute a card and export results in the specified format",
+    description: "Execute a Metabase card and export the results in a specific format (CSV, Excel, JSON, etc.) - use this to download data for external analysis, create reports for stakeholders, or integrate query results with other systems",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       export_format: z.string().describe("Export format (e.g., csv, xlsx, json)"),
@@ -202,10 +280,19 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/card/{id}/copy - Copy card
+  /**
+   * Copy an existing Metabase card
+   * 
+   * Creates a duplicate copy of an existing card with identical query and settings.
+   * Use this to create variations of existing cards, build templates for similar analyses,
+   * or backup important queries before modifications.
+   * 
+   * @param {number} card_id - The ID of the card to copy
+   * @returns {Promise<string>} JSON string of the newly created card copy
+   */
   server.addTool({
     name: "copy_card",
-    description: "Copy a card",
+    description: "Create a duplicate copy of an existing Metabase card with identical query and settings - use this to create variations of existing cards, build templates for similar analyses, or backup important queries before modifications",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
     }),
@@ -223,10 +310,19 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/card/{id}/dashboards - Dashboards containing card
+  /**
+   * Find dashboards containing a specific card
+   * 
+   * Retrieves all dashboards that include a specific Metabase card. Use this to understand
+   * where a card is being used, track dependencies before making changes, or find
+   * related analytical content.
+   * 
+   * @param {number} card_id - The ID of the card to search for
+   * @returns {Promise<string>} JSON string of dashboards array containing the card
+   */
   server.addTool({
     name: "get_card_dashboards",
-    description: "List dashboards containing a card",
+    description: "Find all dashboards that include a specific Metabase card - use this to understand where a card is being used, track dependencies before making changes, or find related analytical content",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
     }),
@@ -244,10 +340,18 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/card/embeddable - Embeddable cards
+  /**
+   * List embeddable Metabase cards
+   * 
+   * Retrieves all cards configured for embedding in external applications.
+   * Requires admin privileges. Use this to audit embedded content, manage external
+   * integrations, or review public-facing analytics.
+   * 
+   * @returns {Promise<string>} JSON string of embeddable cards array
+   */
   server.addTool({
     name: "list_embeddable_cards",
-    description: "List cards with enable_embedding=true (requires superuser)",
+    description: "Retrieve all Metabase cards configured for embedding in external applications (requires admin privileges) - use this to audit embedded content, manage external integrations, or review public-facing analytics",
     execute: async () => {
       try {
         const result = await metabaseClient.getEmbeddableCards();
@@ -262,10 +366,19 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // Public link - create
+  /**
+   * Create public link for a card
+   * 
+   * Generates a publicly accessible URL for a Metabase card that can be viewed
+   * without authentication. Requires admin privileges. Use this to share analytical
+   * insights with external stakeholders, create public reports, or embed charts in websites.
+   * 
+   * @param {number} card_id - The ID of the card to make public
+   * @returns {Promise<string>} JSON string containing the public URL
+   */
   server.addTool({
     name: "create_card_public_link",
-    description: "Create a public link for a card (requires superuser)",
+    description: "Generate a publicly accessible URL for a Metabase card that can be viewed without authentication (requires admin privileges) - use this to share analytical insights with external stakeholders, create public reports, or embed charts in websites",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
     }),
@@ -283,10 +396,19 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // Public link - delete
+  /**
+   * Delete public link for a card
+   * 
+   * Removes public access to a Metabase card by deleting its public URL.
+   * Requires admin privileges. Use this to revoke external access to sensitive data,
+   * clean up unused public links, or update security permissions.
+   * 
+   * @param {number} card_id - The ID of the card to remove public access from
+   * @returns {Promise<string>} JSON string confirming deletion
+   */
   server.addTool({
     name: "delete_card_public_link",
-    description: "Delete a public link for a card (requires superuser)",
+    description: "Remove public access to a Metabase card by deleting its public URL (requires admin privileges) - use this to revoke external access to sensitive data, clean up unused public links, or update security permissions",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
     }),
@@ -304,10 +426,18 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/card/public - Public cards
+  /**
+   * List public Metabase cards
+   * 
+   * Retrieves all cards that have public URLs enabled. Requires admin privileges.
+   * Use this to audit publicly accessible content, review security settings,
+   * or manage external data sharing.
+   * 
+   * @returns {Promise<string>} JSON string of public cards array
+   */
   server.addTool({
     name: "list_public_cards",
-    description: "List public cards (requires superuser)",
+    description: "Retrieve all Metabase cards that have public URLs enabled (requires admin privileges) - use this to audit publicly accessible content, review security settings, or manage external data sharing",
     execute: async () => {
       try {
         const result = await metabaseClient.getPublicCards();
@@ -322,10 +452,21 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/cards/move - Move cards
+  /**
+   * Move multiple cards to different location
+   * 
+   * Relocates multiple Metabase cards to a different collection or dashboard for better
+   * organization. Use this to reorganize analytical content, group related cards,
+   * or clean up workspace structure.
+   * 
+   * @param {number[]} card_ids - Array of card IDs to move
+   * @param {number} [collection_id] - Target collection ID
+   * @param {number} [dashboard_id] - Target dashboard ID
+   * @returns {Promise<string>} JSON string confirming the move operation
+   */
   server.addTool({
     name: "move_cards",
-    description: "Move cards to a collection or dashboard",
+    description: "Relocate multiple Metabase cards to a different collection or dashboard for better organization - use this to reorganize analytical content, group related cards, or clean up workspace structure",
     parameters: z.object({
       card_ids: z.array(z.number()).describe("Card IDs to move"),
       collection_id: z.number().optional().describe("Target collection ID"),
@@ -353,10 +494,20 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/card/collections - Move cards to collection
+  /**
+   * Move cards to a specific collection
+   * 
+   * Bulk transfers multiple Metabase cards to a specific collection for organizational
+   * purposes. Use this to categorize cards by team, project, or topic, or to implement
+   * content governance policies.
+   * 
+   * @param {number[]} card_ids - Array of card IDs to move
+   * @param {number} [collection_id] - Target collection ID
+   * @returns {Promise<string>} JSON string confirming the move operation
+   */
   server.addTool({
     name: "move_cards_to_collection",
-    description: "Move cards to a collection",
+    description: "Bulk transfer multiple Metabase cards to a specific collection for organizational purposes - use this to categorize cards by team, project, or topic, or to implement content governance policies",
     parameters: z.object({
       card_ids: z.array(z.number()).describe("Card IDs to move"),
       collection_id: z.number().optional().describe("Target collection ID"),
@@ -378,10 +529,20 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/card/pivot/{card-id}/query - Execute pivot query
+  /**
+   * Execute card with pivot table formatting
+   * 
+   * Runs a Metabase card with pivot table formatting to cross-tabulate data with rows
+   * and columns. Use this to create summary tables, analyze data relationships,
+   * or generate matrix-style reports from existing cards.
+   * 
+   * @param {number} card_id - The ID of the card to execute with pivot formatting
+   * @param {object} [parameters] - Query execution parameters
+   * @returns {Promise<string>} JSON string of pivot table results
+   */
   server.addTool({
     name: "execute_pivot_card_query",
-    description: "Execute a pivot query for a card",
+    description: "Run a Metabase card with pivot table formatting to cross-tabulate data with rows and columns - use this to create summary tables, analyze data relationships, or generate matrix-style reports from existing cards",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       parameters: z.object({}).optional().describe("Execution parameters"),
@@ -403,10 +564,20 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/card/{card-id}/params/{param-key}/values - Param values
+  /**
+   * Get available parameter values for a card
+   * 
+   * Retrieves all available values for a specific parameter in a Metabase card.
+   * Use this to populate dropdown filters, validate parameter inputs, or understand
+   * what data options are available for interactive cards.
+   * 
+   * @param {number} card_id - The ID of the card
+   * @param {string} param_key - The parameter key to get values for
+   * @returns {Promise<string>} JSON string of available parameter values
+   */
   server.addTool({
     name: "get_card_param_values",
-    description: "Get possible values for a card parameter",
+    description: "Retrieve all available values for a specific parameter in a Metabase card - use this to populate dropdown filters, validate parameter inputs, or understand what data options are available for interactive cards",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       param_key: z.string().describe("Parameter key"),
@@ -428,10 +599,21 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/card/{card-id}/params/{param-key}/search/{query} - Param search
+  /**
+   * Search parameter values for a card
+   * 
+   * Searches and filters available parameter values for a Metabase card using a text query.
+   * Use this to find specific parameter options in large datasets, help users locate
+   * filter values, or implement autocomplete functionality.
+   * 
+   * @param {number} card_id - The ID of the card
+   * @param {string} param_key - The parameter key to search within
+   * @param {string} query - Search query text
+   * @returns {Promise<string>} JSON string of matching parameter values
+   */
   server.addTool({
     name: "search_card_param_values",
-    description: "Search parameter values for a card",
+    description: "Search and filter available parameter values for a Metabase card using a text query - use this to find specific parameter options in large datasets, help users locate filter values, or implement autocomplete functionality",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       param_key: z.string().describe("Parameter key"),
@@ -459,10 +641,21 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/card/{id}/params/{param-key}/remapping - Param remapping
+  /**
+   * Get parameter value remapping for a card
+   * 
+   * Retrieves how parameter values are remapped or transformed for display in a Metabase card.
+   * Use this to understand data transformations, debug parameter issues, or see how
+   * raw values are presented to users.
+   * 
+   * @param {number} card_id - The ID of the card
+   * @param {string} param_key - The parameter key
+   * @param {string} value - The parameter value to check remapping for
+   * @returns {Promise<string>} JSON string of remapping information
+   */
   server.addTool({
     name: "get_card_param_remapping",
-    description: "Get parameter value remapping for a card",
+    description: "Retrieve how parameter values are remapped or transformed for display in a Metabase card - use this to understand data transformations, debug parameter issues, or see how raw values are presented to users",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       param_key: z.string().describe("Parameter key"),
@@ -490,10 +683,19 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/card/{id}/query_metadata - Query metadata
+  /**
+   * Get query metadata for a card
+   * 
+   * Retrieves structural metadata about a Metabase card's underlying query including
+   * column types, field information, and data schema. Use this to understand card structure,
+   * validate data types, or build dynamic interfaces.
+   * 
+   * @param {number} card_id - The ID of the card
+   * @returns {Promise<string>} JSON string of query metadata
+   */
   server.addTool({
     name: "get_card_query_metadata",
-    description: "Get query metadata for a card",
+    description: "Retrieve structural metadata about a Metabase card's underlying query including column types, field information, and data schema - use this to understand card structure, validate data types, or build dynamic interfaces",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
     }),
@@ -511,10 +713,22 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/card/{id}/series - Card series
+  /**
+   * Get time series data or related suggestions for a card
+   * 
+   * Retrieves time series data or related card suggestions for a Metabase card.
+   * Use this to get chronological data trends, find similar cards, or discover
+   * related analytical content for dashboard building.
+   * 
+   * @param {number} card_id - The ID of the card
+   * @param {string|number} [last_cursor] - Pagination cursor for results
+   * @param {string} [query] - Filter query for suggestions
+   * @param {number[]} [exclude_ids] - Card IDs to exclude from suggestions
+   * @returns {Promise<string>} JSON string of time series data or card suggestions
+   */
   server.addTool({
     name: "get_card_series",
-    description: "Get time series/suggestions for a card",
+    description: "Retrieve time series data or related card suggestions for a Metabase card - use this to get chronological data trends, find similar cards, or discover related analytical content for dashboard building",
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       last_cursor: z

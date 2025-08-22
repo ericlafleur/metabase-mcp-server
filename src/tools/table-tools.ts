@@ -2,10 +2,20 @@ import { z } from "zod";
 import { MetabaseClient } from "../client/metabase-client.js";
 
 export function addTableTools(server: any, metabaseClient: MetabaseClient) {
-  // GET /api/table - List tables (optional ids filter)
+
+  /**
+   * List all available tables
+   * 
+   * Retrieves all tables with optional filtering by specific table IDs.
+   * Use this to discover available tables, explore database schema,
+   * or get metadata about specific tables.
+   * 
+   * @param {number[]} [ids] - Optional list of table IDs to filter by
+   * @returns {Promise<string>} JSON string of tables array
+   */
   server.addTool({
     name: "list_tables",
-    description: "List tables with optional ids filter",
+    description: "Retrieve all Metabase tables with optional ID filtering - use this to discover available tables, explore database schema, or get metadata about specific tables",
     parameters: z.object({
       ids: z
         .array(z.number())
@@ -26,10 +36,20 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // PUT /api/table - Bulk update tables
+  /**
+   * Bulk update multiple tables
+   * 
+   * Updates multiple tables simultaneously with the same configuration changes.
+   * Use this to apply consistent settings across tables, update metadata,
+   * or modify table properties efficiently.
+   * 
+   * @param {number[]} ids - Array of table IDs to update
+   * @param {object} updates - Update payload applied to all tables
+   * @returns {Promise<string>} JSON string of update results
+   */
   server.addTool({
     name: "update_tables",
-    description: "Bulk update multiple tables",
+    description: "Bulk update multiple Metabase tables with same configuration - use this to apply consistent settings, update metadata, or modify table properties efficiently",
     parameters: z.object({
       ids: z.array(z.number()).describe("IDs of tables to update"),
       updates: z.object({}).describe("Update payload applied to all tables"),
@@ -48,10 +68,22 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/table/{id} - Get table
+  /**
+   * Get detailed table information
+   * 
+   * Retrieves comprehensive information about a specific table including schema,
+   * fields, data types, and metadata. Use this to understand table structure,
+   * explore available fields, or get configuration details.
+   * 
+   * @param {number} table_id - The ID of the table to retrieve
+   * @param {boolean} [include_sensitive_fields] - Include sensitive fields in response
+   * @param {boolean} [include_hidden_fields] - Include hidden fields in response
+   * @param {boolean} [include_editable_data_model] - Include editable data model info
+   * @returns {Promise<string>} JSON string with complete table information
+   */
   server.addTool({
     name: "get_table",
-    description: "Get a table by ID",
+    description: "Retrieve comprehensive table information including schema, fields, and metadata - use this to understand structure, explore fields, or get configuration details",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       include_sensitive_fields: z
@@ -90,10 +122,20 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // PUT /api/table/{id} - Update table
+  /**
+   * Update table configuration and metadata
+   * 
+   * Modifies table properties such as display name, description, visibility settings,
+   * and field configurations. Use this to customize table presentation, update
+   * metadata, or configure data model settings.
+   * 
+   * @param {number} table_id - The ID of the table to update
+   * @param {Object} updates - Fields and values to update
+   * @returns {Promise<string>} JSON string of the updated table object
+   */
   server.addTool({
     name: "update_table",
-    description: "Update a table",
+    description: "Update table configuration including display name, description, and field settings - use this to customize presentation, update metadata, or configure data model",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       updates: z.object({}).describe("Fields to update"),
@@ -115,10 +157,19 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/table/{id}/fks - Foreign keys
+  /**
+   * Get table foreign key relationships
+   * 
+   * Retrieves all foreign key relationships for a table, showing connections
+   * to other tables. Use this to understand data relationships, build joins,
+   * or explore table dependencies.
+   * 
+   * @param {number} table_id - The ID of the table
+   * @returns {Promise<string>} JSON string with foreign key relationship details
+   */
   server.addTool({
     name: "get_table_fks",
-    description: "Get foreign keys for a table",
+    description: "Retrieve foreign key relationships for a table - use this to understand data connections, build joins, or explore table dependencies",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
     }),
@@ -136,10 +187,22 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/table/{id}/query_metadata - Query metadata
+  /**
+   * Get table query metadata for building queries
+   * 
+   * Retrieves metadata specifically formatted for query building, including
+   * field types, constraints, and query-relevant information. Use this when
+   * constructing dynamic queries or building query interfaces.
+   * 
+   * @param {number} table_id - The ID of the table
+   * @param {boolean} [include_sensitive_fields] - Include sensitive fields
+   * @param {boolean} [include_hidden_fields] - Include hidden fields
+   * @param {boolean} [include_editable_data_model] - Include editable model info
+   * @returns {Promise<string>} JSON string with query-optimized metadata
+   */
   server.addTool({
     name: "get_table_query_metadata",
-    description: "Get query metadata for a table",
+    description: "Retrieve query-optimized table metadata for building dynamic queries - use this when constructing queries or building query interfaces",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       include_sensitive_fields: z.boolean().optional(),
@@ -172,10 +235,19 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/table/{id}/related - Related tables/views
+  /**
+   * Get related tables and entities
+   * 
+   * Finds tables and entities related to the specified table through foreign keys,
+   * similar schemas, or other relationships. Use this to discover connected data,
+   * find related analytical content, or understand data context.
+   * 
+   * @param {number} table_id - The ID of the table
+   * @returns {Promise<string>} JSON string with related tables and entities
+   */
   server.addTool({
     name: "get_table_related",
-    description: "Get related tables and fields",
+    description: "Find tables and entities related through relationships or schemas - use this to discover connected data, find related content, or understand context",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
     }),
@@ -193,10 +265,19 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/table/card__{id}/fks - FKs for card virtual table
+  /**
+   * Get foreign keys for card virtual table
+   * 
+   * Retrieves foreign key relationships for a card's virtual table (card__{id}).
+   * Card virtual tables represent saved questions as queryable tables.
+   * Use this to understand relationships in card-based queries.
+   * 
+   * @param {number} card_id - The ID of the card (creates virtual table card__{id})
+   * @returns {Promise<string>} JSON string with virtual table foreign keys
+   */
   server.addTool({
     name: "get_card_table_fks",
-    description: "Get foreign keys for a card's virtual table (card__{id})",
+    description: "Retrieve foreign keys for a card's virtual table - use this to understand relationships in card-based queries or saved question tables",
     parameters: z.object({
       card_id: z.number().describe("Card ID for the virtual table"),
     }),
@@ -214,10 +295,19 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/table/card__{id}/query_metadata - Query metadata for card virtual table
+  /**
+   * Get query metadata for card virtual table
+   * 
+   * Retrieves query metadata for a card's virtual table, allowing the saved
+   * question to be treated as a queryable table. Use this to build queries
+   * on top of existing saved questions or cards.
+   * 
+   * @param {number} card_id - The ID of the card (creates virtual table card__{id})
+   * @returns {Promise<string>} JSON string with virtual table query metadata
+   */
   server.addTool({
     name: "get_card_table_query_metadata",
-    description: "Get query metadata for a card's virtual table (card__{id})",
+    description: "Retrieve query metadata for a card's virtual table - use this to build queries on top of saved questions or treat cards as queryable tables",
     parameters: z.object({
       card_id: z.number().describe("Card ID for the virtual table"),
     }),
@@ -237,10 +327,21 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/table/{id}/append-csv - Append CSV to table
+  /**
+   * Append CSV data to existing table
+   * 
+   * Adds new rows from CSV content to an existing table. The CSV structure
+   * must match the table schema. Use this to incrementally load data,
+   * update tables with new records, or import additional data.
+   * 
+   * @param {number} table_id - The ID of the table to append to
+   * @param {string} filename - CSV filename (for metadata and logging)
+   * @param {string} file_content - CSV file content as string
+   * @returns {Promise<string>} JSON string with append operation results
+   */
   server.addTool({
     name: "append_csv_to_table",
-    description: "Append CSV content to a table",
+    description: "Add new rows from CSV content to existing table - use this for incremental data loading, updates, or importing additional records",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       filename: z.string().describe("CSV filename (for metadata only)"),
@@ -268,10 +369,19 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/table/{id}/discard_values - Discard cached field values
+  /**
+   * Discard cached field values
+   * 
+   * Clears Metabase's cache of field values for a table, forcing fresh
+   * data to be loaded on next access. Use this when table data has changed
+   * significantly or when cached values are stale.
+   * 
+   * @param {number} table_id - The ID of the table
+   * @returns {Promise<string>} JSON string confirming cache clearing
+   */
   server.addTool({
     name: "discard_table_field_values",
-    description: "Discard cached field values for a table",
+    description: "Clear cached field values to force fresh data loading - use this when table data has changed or cached values are stale",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
     }),
@@ -291,10 +401,20 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // PUT /api/table/{id}/fields/order - Reorder fields
+  /**
+   * Reorder table fields display sequence
+   * 
+   * Changes the display order of fields in a table for better organization
+   * and user experience. Use this to arrange fields logically, group related
+   * columns, or improve data presentation.
+   * 
+   * @param {number} table_id - The ID of the table
+   * @param {Array<number>} field_order - Array of field IDs in desired display order
+   * @returns {Promise<string>} JSON string confirming field reordering
+   */
   server.addTool({
     name: "reorder_table_fields",
-    description: "Reorder fields for a table",
+    description: "Change display order of table fields for better organization - use this to arrange fields logically, group columns, or improve presentation",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       field_order: z
@@ -318,10 +438,20 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/table/{id}/replace-csv - Replace table data with CSV
+  /**
+   * Replace table data with CSV content
+   * 
+   * Completely replaces existing table data with new CSV content. This is
+   * typically used with Metabase CSV models. Use this for full data refreshes,
+   * model updates, or complete table replacements.
+   * 
+   * @param {number} table_id - The ID of the table (must be CSV model)
+   * @param {string} csv_file - Complete CSV file content as string
+   * @returns {Promise<string>} JSON string with replacement operation results
+   */
   server.addTool({
     name: "replace_table_csv",
-    description: "Replace table data with provided CSV (Metabase CSV model)",
+    description: "Completely replace table data with new CSV content - use this for full data refreshes, model updates, or complete table replacements",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       csv_file: z.string().describe("CSV file content as string"),
@@ -343,10 +473,19 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/table/{id}/rescan_values - Rescan field values
+  /**
+   * Rescan and refresh field values cache
+   * 
+   * Triggers a rescan of field values to update Metabase's cache with current
+   * data. Use this to refresh dropdown options, update field statistics,
+   * or ensure filters show current values.
+   * 
+   * @param {number} table_id - The ID of the table
+   * @returns {Promise<string>} JSON string confirming rescan initiation
+   */
   server.addTool({
     name: "rescan_table_field_values",
-    description: "Rescan cached field values for a table",
+    description: "Trigger rescan to refresh field values cache with current data - use this to update dropdown options, statistics, or filter values",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
     }),
@@ -366,10 +505,19 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // POST /api/table/{id}/sync_schema - Trigger schema sync
+  /**
+   * Trigger table schema synchronization
+   * 
+   * Initiates a schema sync for a specific table to update its metadata
+   * and structure information in Metabase. Use this when table schema
+   * has changed and needs to be recognized by Metabase.
+   * 
+   * @param {number} table_id - The ID of the table to sync
+   * @returns {Promise<string>} JSON string confirming sync initiation
+   */
   server.addTool({
     name: "sync_table_schema",
-    description: "Trigger schema sync for a table",
+    description: "Initiate schema sync for specific table to update metadata - use this when table structure has changed and needs recognition",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
     }),
@@ -391,10 +539,20 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
     },
   });
 
-  // GET /api/table/{table-id}/data - Sample table data
+  /**
+   * Fetch sample data from table
+   * 
+   * Retrieves a sample of actual data from the table for preview, analysis,
+   * or testing purposes. Use this to examine data content, verify data quality,
+   * or understand data patterns and formats.
+   * 
+   * @param {number} table_id - The ID of the table
+   * @param {number} [limit=1000] - Maximum number of rows to return
+   * @returns {Promise<string>} JSON string with sample table data
+   */
   server.addTool({
     name: "get_table_data",
-    description: "Fetch sample data from a table",
+    description: "Retrieve sample data from table for preview and analysis - use this to examine content, verify quality, or understand data patterns",
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       limit: z.number().optional().describe("Row limit (default 1000)"),

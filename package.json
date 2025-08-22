@@ -43,8 +43,6 @@
     "start": "npm run build && node dist/fastmcp-server.js",
     "dev": "npx fastmcp dev src/fastmcp-server.ts",
     "clean": "rm -rf build dist",
-    "test": "npm run build && echo 'Tests would go here'",
-    "lint": "echo 'Linting would go here'",
     "docker:build": "docker build -t mcp-metabase-server .",
     "docker:run": "docker run -it --rm mcp-metabase-server",
     "docker:compose": "docker-compose up"
