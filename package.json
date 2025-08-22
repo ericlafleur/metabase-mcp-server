@@ -1,5 +1,5 @@
 {
-  "name": "@usacognition/mcp-metabase-server",
+  "name": "@windsurf-public/mcp-metabase-server",
   "version": "1.0.1",
   "description": "A Model Context Protocol server for Metabase integration",
   "author": "Cognition <devin@cognition.ai>",

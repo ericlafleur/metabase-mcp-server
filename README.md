@@ -1,6 +1,6 @@
 # Placeholder Readme: Metabase MCP Server
 
-[![npm version](https://badge.fury.io/js/%40usacognition%2Fmcp-metabase-server.svg)](https://badge.fury.io/js/%40usacognition%2Fmcp-metabase-server)
+[![npm version](https://badge.fury.io/js/%40windsurf-public%2Fmcp-metabase-server.svg)](https://badge.fury.io/js/%40windsurf-public%2Fmcp-metabase-server)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
@@ -13,7 +13,7 @@ A comprehensive Model Context Protocol (MCP) server for Metabase integration, pr
 # Install and run with npx
 export METABASE_URL=https://your-metabase-instance.com
 export METABASE_API_KEY=your_metabase_api_key
-npx @usacognition/mcp-metabase-server
+npx @windsurf-public/mcp-metabase-server
 ```
 
 ## ✨ Features
@@ -41,12 +41,12 @@ Access Metabase entities via standardized URIs:
 
 ### Method 1: NPX (Recommended)
 ```bash
-npx @usacognition/mcp-metabase-server
+npx @windsurf-public/mcp-metabase-server
 ```
 
 ### Method 2: Global Installation
 ```bash
-npm install -g @usacognition/mcp-metabase-server
+npm install -g @windsurf-public/mcp-metabase-server
 mcp-metabase-server
 ```
 
@@ -86,7 +86,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
   "mcpServers": {
     "metabase": {
       "command": "npx",
-      "args": ["@usacognition/mcp-metabase-server"],
+      "args": ["@windsurf-public/mcp-metabase-server"],
       "env": {
         "METABASE_URL": "https://your-metabase-instance.com",
         "METABASE_API_KEY": "your_metabase_api_key"
@@ -105,7 +105,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_servers.json`):
   "mcpServers": {
     "metabase": {
       "command": "npx",
-      "args": ["@usacognition/mcp-metabase-server"],
+      "args": ["@windsurf-public/mcp-metabase-server"],
       "env": {
         "METABASE_URL": "https://your-metabase-instance.com",
         "METABASE_API_KEY": "your_metabase_api_key"
@@ -333,7 +333,7 @@ npm run inspector
 ### Debug Mode
 Enable detailed logging:
 ```bash
-DEBUG=* npx @usacognition/mcp-metabase-server
+DEBUG=* npx @windsurf-public/mcp-metabase-server
 ```
 
 ## 📄 License
