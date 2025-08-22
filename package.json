@@ -26,9 +26,9 @@
   ],
   "private": false,
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/server.js",
   "bin": {
-    "mcp-metabase-server": "./dist/index.js"
+    "mcp-metabase-server": "./dist/server.js"
   },
   "files": [
     "dist",
@@ -36,12 +36,12 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\" && mkdir -p dist && cp -r build/* dist/",
+    "build": "tsc && node -e \"require('fs').chmodSync('build/server.js', '755')\" && mkdir -p dist && cp -r build/* dist/",
     "watch": "tsc --watch",
-    "inspector": "npm run build && npx fastmcp inspect dist/fastmcp-server.js",
-    "inspector-debug": "npm run build && npx fastmcp inspect dist/fastmcp-server.js 2>&1",
-    "start": "npm run build && node dist/fastmcp-server.js",
-    "dev": "npx fastmcp dev src/fastmcp-server.ts",
+    "inspector": "npm run build && npx fastmcp inspect dist/server.js",
+    "inspector-debug": "npm run build && npx fastmcp inspect dist/server.js 2>&1",
+    "start": "npm run build && node dist/server.js",
+    "dev": "npx fastmcp dev src/server.ts",
     "clean": "rm -rf build dist",
     "docker:build": "docker build -t mcp-metabase-server .",
     "docker:run": "docker run -it --rm mcp-metabase-server",
