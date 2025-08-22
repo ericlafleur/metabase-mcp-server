@@ -32,20 +32,21 @@ server.addTool = function(toolConfig: any) {
   const { metadata = {}, ...restConfig } = toolConfig;
   const { isWrite, isEssential } = metadata;
 
-  // Apply filtering logic
+  // Skip non-essential tools when essential mode is enabled
   if (filterOptions.essentialOnly && !isEssential) {
-    return; // Skip non-essential tools
+    return;
   }
 
+  // Skip non-write tools when write mode is disabled
   if (filterOptions.writeMode && !isWrite) {
-    return; // Skip write tools when write mode is disabled
+    return;
   }
 
-  // Register the tool (without metadata)
+  // Register the tool
   originalAddTool(restConfig);
 };
 
-// Add all tools - they'll be filtered automatically
+// Adding all tools to the server
 addDashboardTools(server, metabaseClient);
 addDatabaseTools(server, metabaseClient);
 addCardTools(server, metabaseClient);
