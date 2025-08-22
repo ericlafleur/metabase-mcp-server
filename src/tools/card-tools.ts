@@ -17,6 +17,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "list_cards",
     description: "Retrieve all Metabase cards with optional filtering by source type (e.g., 'models') or model relationships - use this to discover available cards, find specific cards by type, or get an overview of all analytical content",
+    metadata: { isEssential: true },
     parameters: z.object({
       f: z.string().optional().describe("Filter by source (e.g., 'models')"),
       model_id: z.number().optional().describe("Filter by model_id"),
@@ -79,6 +80,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "create_card",
     description: "Create a new Metabase card with custom query, visualization type, and settings - use this to programmatically build new analytical cards, dashboards charts, or data exploration queries",
+    metadata: { isWrite: true },
     parameters: z
       .object({
         name: z.string().describe("Card name"),
@@ -119,6 +121,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "update_card",
     description: "Modify an existing Metabase card's name, description, query definition, visualization type, or settings - use this to fix broken cards, change chart types, update queries, or move cards between collections",
+    metadata: { isWrite: true },
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       updates: z.object({}).describe("Fields to update"),
@@ -160,6 +163,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "delete_card",
     description: "Remove a Metabase card either by archiving (soft delete, preserves history) or permanent deletion - use this to clean up unused cards, remove broken cards, or organize analytical content",
+    metadata: { isWrite: true },
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       hard_delete: z
@@ -205,6 +209,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "execute_card",
     description: "Run a Metabase card query and return the actual data results - use this to get current data from existing cards, refresh analytical insights, or programmatically access query results for further processing",
+    metadata: { isEssential: true },
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       ignore_cache: z.boolean().optional().describe("Ignore cached results"),
@@ -293,6 +298,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "copy_card",
     description: "Create a duplicate copy of an existing Metabase card with identical query and settings - use this to create variations of existing cards, build templates for similar analyses, or backup important queries before modifications",
+    metadata: { isWrite: true },
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
     }),
@@ -323,6 +329,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_card_dashboards",
     description: "Find all dashboards that include a specific Metabase card - use this to understand where a card is being used, track dependencies before making changes, or find related analytical content",
+    metadata: { isEssential: true },
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
     }),
@@ -467,6 +474,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "move_cards",
     description: "Relocate multiple Metabase cards to a different collection or dashboard for better organization - use this to reorganize analytical content, group related cards, or clean up workspace structure",
+    metadata: { isWrite: true },
     parameters: z.object({
       card_ids: z.array(z.number()).describe("Card IDs to move"),
       collection_id: z.number().optional().describe("Target collection ID"),
@@ -508,6 +516,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "move_cards_to_collection",
     description: "Bulk transfer multiple Metabase cards to a specific collection for organizational purposes - use this to categorize cards by team, project, or topic, or to implement content governance policies",
+    metadata: { isWrite: true },
     parameters: z.object({
       card_ids: z.array(z.number()).describe("Card IDs to move"),
       collection_id: z.number().optional().describe("Target collection ID"),

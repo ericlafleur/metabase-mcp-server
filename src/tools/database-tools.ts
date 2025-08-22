@@ -15,6 +15,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "list_databases",
     description: "Retrieve all database connections in Metabase - use this to discover available data sources, check connection status, or get an overview of connected databases",
+    metadata: { isEssential: true },
     execute: async () => {
       try {
         const databases = await metabaseClient.getDatabases();
@@ -38,6 +39,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_database",
     description: "Retrieve detailed information about a specific Metabase database including connection details and schema - use this to examine database properties or troubleshoot connections",
+    metadata: { isEssential: true },
     parameters: z.object({
       database_id: z.number().describe("The ID of the database to retrieve"),
     }),
@@ -67,6 +69,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "create_database",
     description: "Add a new database connection to Metabase - use this to connect new data sources, establish analytical pipelines, or expand data access",
+    metadata: { isWrite: true },
     parameters: z.object({
       engine: z.string().describe("Database engine type (e.g., postgres, mysql, redshift)"),
       name: z.string().describe("Display name for the database"),
@@ -110,6 +113,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "update_database",
     description: "Update database configuration including name, connection details, and sync settings - use this to maintain connections, update credentials, or modify sync behavior",
+    metadata: { isWrite: true },
     parameters: z.object({
       database_id: z.number().describe("The ID of the database to update"),
       name: z.string().optional().describe("New display name for the database"),
@@ -143,6 +147,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "delete_database",
     description: "Permanently remove a database from Metabase - use with caution as this will break dependent content and cannot be undone",
+    metadata: { isWrite: true },
     parameters: z.object({
       database_id: z.number().describe("The ID of the database to delete"),
     }),
@@ -179,6 +184,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "validate_database",
     description: "Test database connection parameters before creating - use this to verify credentials, connectivity, and accessibility",
+    metadata: { isWrite: true },
     parameters: z.object({
       engine: z.string().describe("Database engine type (e.g., postgres, mysql, redshift)"),
       details: z.object({
@@ -323,6 +329,37 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
         return JSON.stringify(schema, null, 2);
       } catch (error) {
         throw new Error(`Failed to fetch schema ${args.schema_name} for database ${args.database_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
+
+  /**
+   * Execute SQL query against a database
+   * 
+   * Runs a native SQL query against a specified database and returns the results.
+   * Use this to perform custom data analysis, run complex queries, or extract
+   * specific data that isn't available through existing cards or dashboards.
+   * 
+   * @param {number} database_id - The ID of the database to query against
+   * @param {string} query - The SQL query to execute
+   * @param {Array} [parameters] - Optional query parameters for parameterized queries
+   * @returns {Promise<string>} JSON string with query results and metadata
+   */
+  server.addTool({
+    name: "execute_query",
+    description: "Execute a native SQL query against a Metabase database - use this for custom data analysis, complex queries, or extracting specific data not available through existing cards",
+    metadata: { isEssential: true },
+    parameters: z.object({
+      database_id: z.number().describe("The ID of the database to query against"),
+      query: z.string().describe("The SQL query to execute"),
+      parameters: z.array(z.any()).optional().describe("Optional query parameters for parameterized queries"),
+    }),
+    execute: async (args: { database_id: number; query: string; parameters?: any[] }) => {
+      try {
+        const result = await metabaseClient.executeQuery(args.database_id, args.query, args.parameters || []);
+        return JSON.stringify(result, null, 2);
+      } catch (error) {
+        throw new Error(`Failed to execute query on database ${args.database_id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     },
   });

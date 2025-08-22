@@ -16,6 +16,7 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "list_tables",
     description: "Retrieve all Metabase tables with optional ID filtering - use this to discover available tables, explore database schema, or get metadata about specific tables",
+    metadata: { isEssential: true },
     parameters: z.object({
       ids: z
         .array(z.number())
@@ -84,6 +85,7 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_table",
     description: "Retrieve comprehensive table information including schema, fields, and metadata - use this to understand structure, explore fields, or get configuration details",
+    metadata: { isEssential: true },
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       include_sensitive_fields: z
@@ -136,6 +138,7 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "update_table",
     description: "Update table configuration including display name, description, and field settings - use this to customize presentation, update metadata, or configure data model",
+    metadata: { isWrite: true },
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       updates: z.object({}).describe("Fields to update"),
@@ -415,6 +418,7 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "reorder_table_fields",
     description: "Change display order of table fields for better organization - use this to arrange fields logically, group columns, or improve presentation",
+    metadata: { isWrite: true },
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       field_order: z

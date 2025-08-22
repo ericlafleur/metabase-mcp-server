@@ -783,6 +783,7 @@ export class MetabaseClient {
     return response.data;
   }
 
+
   // Generic API method for other operations
   async apiCall(
     method: "GET" | "POST" | "PUT" | "DELETE",
