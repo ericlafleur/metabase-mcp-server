@@ -101,5 +101,5 @@ export interface QueryResult {
 
 export interface ToolFilterOptions {
   includeWriteTools: boolean;
-  includeAllTools: boolean;
+  includeEssential: boolean;
 }

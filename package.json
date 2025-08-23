@@ -1,6 +1,6 @@
 {
-  "name": "@usacognition/mcp-metabase-server",
-  "version": "1.0.1",
+  "name": "@windsurf-public/mcp-metabase-server",
+  "version": "1.0.2",
   "description": "A Model Context Protocol server for Metabase integration",
   "author": "Cognition <devin@cognition.ai>",
   "license": "MIT",
@@ -22,13 +22,14 @@
     "analytics",
     "business-intelligence",
     "ai",
-    "claude"
+    "claude",
+    "metabase"
   ],
   "private": false,
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/server.js",
   "bin": {
-    "mcp-metabase-server": "./dist/index.js"
+    "mcp-metabase-server": "./dist/server.js"
   },
   "files": [
     "dist",
@@ -36,14 +37,12 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\" && mkdir -p dist && cp -r build/* dist/",
+    "build": "tsc && node -e \"require('fs').chmodSync('build/server.js', '755')\" && mkdir -p dist && cp -r build/* dist/",
     "watch": "tsc --watch",
-    "inspector": "npx @modelcontextprotocol/inspector dist/index.js",
-    "start": "node dist/index.js --port=8080",
-    "dev": "npm run build && npm start",
+    "inspector": "npm run build && npx fastmcp inspect dist/server.js",
+    "start": "npm run build && node dist/server.js",
+    "dev": "npx fastmcp dev src/server.ts",
     "clean": "rm -rf build dist",
-    "test": "npm run build && echo 'Tests would go here'",
-    "lint": "echo 'Linting would go here'",
     "docker:build": "docker build -t mcp-metabase-server .",
     "docker:run": "docker run -it --rm mcp-metabase-server",
     "docker:compose": "docker-compose up"
@@ -53,10 +52,15 @@
     "abort-controller": "^3.0.0",
     "axios": "^1.8.2",
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "fastmcp": "^3.14.5"
   },
   "devDependencies": {
     "@types/node": "^20.17.22",
     "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.19.0",
+    "npm": ">=8.0.0"
   }
 }

@@ -48,6 +48,24 @@ export class MetabaseClient {
         "Metabase authentication credentials not provided or incomplete."
       );
     }
+
+    // Add request interceptor to handle authentication automatically
+    this.axiosInstance.interceptors.request.use(
+      async (config) => {
+        // Skip authentication for the session endpoint itself
+        if (config.url === "/api/session") {
+          return config;
+        }
+
+        // Ensure authentication before making any API call
+        await this.ensureAuthenticated();
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
+
   }
 
   private logInfo(message: string, data?: unknown) {
@@ -117,19 +135,16 @@ export class MetabaseClient {
 
   // Dashboard operations
   async getDashboards(): Promise<Dashboard[]> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get("/api/dashboard");
     return response.data;
   }
 
   async getDashboard(id: number): Promise<Dashboard> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/dashboard/${id}`);
     return response.data;
   }
 
   async createDashboard(dashboard: Partial<Dashboard>): Promise<Dashboard> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post("/api/dashboard", dashboard);
     return response.data;
   }
@@ -138,7 +153,6 @@ export class MetabaseClient {
     id: number,
     updates: Partial<Dashboard>
   ): Promise<Dashboard> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.put(
       `/api/dashboard/${id}`,
       updates
@@ -150,7 +164,6 @@ export class MetabaseClient {
     id: number,
     hardDelete: boolean = false
   ): Promise<void> {
-    await this.ensureAuthenticated();
     if (hardDelete) {
       await this.axiosInstance.delete(`/api/dashboard/${id}`);
     } else {
@@ -158,9 +171,86 @@ export class MetabaseClient {
     }
   }
 
+  async getDashboardRelatedEntities(id: number): Promise<any> {
+    const response = await this.axiosInstance.get(`/api/dashboard/${id}/related`);
+    return response.data;
+  }
+
+  async getDashboardRevisions(id: number): Promise<any> {
+    const response = await this.axiosInstance.get(`/api/dashboard/${id}/revisions`);
+    return response.data;
+  }
+
+  async getEmbeddableDashboards(): Promise<any> {
+    const response = await this.axiosInstance.get('/api/dashboard/embeddable');
+    return response.data;
+  }
+
+  async getPublicDashboards(): Promise<any> {
+    const response = await this.axiosInstance.get('/api/dashboard/public');
+    return response.data;
+  }
+
+  async createDashboardPublicLink(id: number): Promise<any> {
+    const response = await this.axiosInstance.post(`/api/dashboard/${id}/public_link`);
+    return response.data;
+  }
+
+  async deleteDashboardPublicLink(id: number): Promise<void> {
+    await this.axiosInstance.delete(`/api/dashboard/${id}/public_link`);
+  }
+
+  async copyDashboard(fromId: number, copyData: any = {}): Promise<any> {
+    const response = await this.axiosInstance.post(`/api/dashboard/${fromId}/copy`, copyData);
+    return response.data;
+  }
+
+  async addCardToDashboard(dashboardId: number, cardData: any): Promise<any> {
+    const response = await this.axiosInstance.post(`/api/dashboard/${dashboardId}/cards`, cardData);
+    return response.data;
+  }
+
+  async updateDashboardCards(dashboardId: number, cards: any[]): Promise<any> {
+    const response = await this.axiosInstance.put(`/api/dashboard/${dashboardId}/cards`, { cards });
+    return response.data;
+  }
+
+  async removeCardsFromDashboard(dashboardId: number, cardIds: number[]): Promise<any> {
+    const response = await this.axiosInstance.delete(`/api/dashboard/${dashboardId}/cards`, {
+      data: { card_ids: cardIds }
+    });
+    return response.data;
+  }
+
+  async favoriteDashboard(id: number): Promise<any> {
+    const response = await this.axiosInstance.post(`/api/dashboard/${id}/favorite`);
+    return response.data;
+  }
+
+  async unfavoriteDashboard(id: number): Promise<any> {
+    const response = await this.axiosInstance.delete(`/api/dashboard/${id}/favorite`);
+    return response.data;
+  }
+
+  async revertDashboard(id: number, revisionId: number): Promise<any> {
+    const response = await this.axiosInstance.post(`/api/dashboard/${id}/revert`, {
+      revision_id: revisionId
+    });
+    return response.data;
+  }
+
+  async saveDashboard(dashboard: any): Promise<any> {
+    const response = await this.axiosInstance.post('/api/dashboard/save', dashboard);
+    return response.data;
+  }
+
+  async saveDashboardToCollection(parentCollectionId: number, dashboard: any): Promise<any> {
+    const response = await this.axiosInstance.post(`/api/dashboard/save/collection/${parentCollectionId}`, dashboard);
+    return response.data;
+  }
+
   // Card operations
   async getCards(options: { f?: string; model_id?: number } = {}): Promise<Card[]> {
-    await this.ensureAuthenticated();
     const params = new URLSearchParams();
     
     if (options.f !== undefined) {
@@ -176,19 +266,16 @@ export class MetabaseClient {
   }
 
   async getCard(id: number): Promise<Card> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/card/${id}`);
     return response.data;
   }
 
   async createCard(card: Partial<Card>): Promise<Card> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post("/api/card", card);
     return response.data;
   }
 
   async updateCard(id: number, updates: Partial<Card>, queryParams?: any): Promise<Card> {
-    await this.ensureAuthenticated();
     let url = `/api/card/${id}`;
     
     if (queryParams && Object.keys(queryParams).length > 0) {
@@ -206,7 +293,6 @@ export class MetabaseClient {
   }
 
   async deleteCard(id: number, hardDelete: boolean = false): Promise<void> {
-    await this.ensureAuthenticated();
     if (hardDelete) {
       await this.axiosInstance.delete(`/api/card/${id}`);
     } else {
@@ -215,7 +301,6 @@ export class MetabaseClient {
   }
 
   async executeCard(id: number, options: { ignore_cache?: boolean; collection_preview?: boolean; dashboard_id?: number } = {}): Promise<QueryResult> {
-    await this.ensureAuthenticated();
     const requestBody: any = {
       ignore_cache: options.ignore_cache || false,
     };
@@ -233,7 +318,6 @@ export class MetabaseClient {
   }
 
   async moveCards(cardIds: number[], collectionId?: number, dashboardId?: number): Promise<any> {
-    await this.ensureAuthenticated();
     const data: any = { card_ids: cardIds };
     
     if (collectionId) {
@@ -249,7 +333,6 @@ export class MetabaseClient {
 
   // Card collection operations
   async moveCardsToCollection(cardIds: number[], collectionId?: number): Promise<any> {
-    await this.ensureAuthenticated();
     const requestBody: any = { card_ids: cardIds };
     
     if (collectionId !== undefined) {
@@ -262,88 +345,75 @@ export class MetabaseClient {
 
   // Card embeddable operations
   async getEmbeddableCards(): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get("/api/card/embeddable");
     return response.data;
   }
 
   // Card pivot query operations
   async executePivotCardQuery(cardId: number, parameters: any = {}): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post(`/api/card/pivot/${cardId}/query`, parameters);
     return response.data;
   }
 
   // Card public operations
   async getPublicCards(): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get("/api/card/public");
     return response.data;
   }
 
   // Card parameter operations
   async getCardParamValues(cardId: number, paramKey: string): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/card/${cardId}/params/${paramKey}/values`);
     return response.data;
   }
 
   async searchCardParamValues(cardId: number, paramKey: string, query: string): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/card/${cardId}/params/${paramKey}/search/${query}`);
     return response.data;
   }
 
   async getCardParamRemapping(cardId: number, paramKey: string, value: string): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/card/${cardId}/params/${paramKey}/remapping?value=${encodeURIComponent(value)}`);
     return response.data;
   }
 
   // Card public link operations
   async createCardPublicLink(cardId: number): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post(`/api/card/${cardId}/public_link`);
     return response.data;
   }
 
   async deleteCardPublicLink(cardId: number): Promise<any> {
-    await this.ensureAuthenticated();
     await this.axiosInstance.delete(`/api/card/${cardId}/public_link`);
     return { success: true };
   }
 
   // Card query operations
   async executeCardQueryWithFormat(cardId: number, exportFormat: string, parameters: any = {}): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post(`/api/card/${cardId}/query/${exportFormat}`, parameters);
     return response.data;
   }
 
   // Card copy operations
   async copyCard(cardId: number): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post(`/api/card/${cardId}/copy`);
     return response.data;
   }
 
   // Card dashboard operations
   async getCardDashboards(cardId: number): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/card/${cardId}/dashboards`);
     return response.data;
   }
 
   // Card metadata operations
   async getCardQueryMetadata(cardId: number): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/card/${cardId}/query_metadata`);
     return response.data;
   }
 
   // Card series operations
   async getCardSeries(cardId: number, options: any = {}): Promise<any> {
-    await this.ensureAuthenticated();
     const params = new URLSearchParams();
     
     if (options.last_cursor !== undefined) {
@@ -365,14 +435,61 @@ export class MetabaseClient {
 
   // Database operations
   async getDatabases(): Promise<Database[]> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get("/api/database");
     return response.data;
   }
 
   async getDatabase(id: number): Promise<Database> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/database/${id}`);
+    return response.data;
+  }
+
+  async createDatabase(payload: any): Promise<Database> {
+    const response = await this.axiosInstance.post("/api/database", payload);
+    return response.data;
+  }
+
+  async updateDatabase(id: number, updates: any): Promise<Database> {
+    const response = await this.axiosInstance.put(`/api/database/${id}`, updates);
+    return response.data;
+  }
+
+  async deleteDatabase(id: number): Promise<void> {
+    await this.axiosInstance.delete(`/api/database/${id}`);
+  }
+
+  async validateDatabase(engine: string, details: any): Promise<any> {
+    const response = await this.axiosInstance.post(`/api/database/validate`, { engine, details });
+    return response.data;
+  }
+
+  async addSampleDatabase(): Promise<Database> {
+    const response = await this.axiosInstance.post(`/api/database/sample_database`);
+    return response.data;
+  }
+
+  async checkDatabaseHealth(id: number): Promise<any> {
+    const response = await this.axiosInstance.get(`/api/database/${id}/healthcheck`);
+    return response.data;
+  }
+
+  async getDatabaseMetadata(id: number): Promise<any> {
+    const response = await this.axiosInstance.get(`/api/database/${id}/metadata`);
+    return response.data;
+  }
+
+  async getDatabaseSchemas(id: number): Promise<any> {
+    const response = await this.axiosInstance.get(`/api/database/${id}/schemas`);
+    return response.data;
+  }
+
+  async getDatabaseSchema(id: number, schema: string): Promise<any> {
+    const response = await this.axiosInstance.get(`/api/database/${id}/schema/${encodeURIComponent(schema)}`);
+    return response.data;
+  }
+
+  async syncDatabaseSchema(id: number): Promise<any> {
+    const response = await this.axiosInstance.post(`/api/database/${id}/sync_schema`);
     return response.data;
   }
 
@@ -381,7 +498,6 @@ export class MetabaseClient {
     query: string,
     parameters: any[] = []
   ): Promise<QueryResult> {
-    await this.ensureAuthenticated();
     const queryData = {
       type: "native",
       native: {
@@ -397,7 +513,6 @@ export class MetabaseClient {
 
   // Collection operations
   async getCollections(archived: boolean = false): Promise<Collection[]> {
-    await this.ensureAuthenticated();
     const params = archived ? { archived: true } : {};
     const response = await this.axiosInstance.get("/api/collection", {
       params,
@@ -406,13 +521,11 @@ export class MetabaseClient {
   }
 
   async getCollection(id: number): Promise<Collection> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/collection/${id}`);
     return response.data;
   }
 
   async createCollection(collection: Partial<Collection>): Promise<Collection> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post(
       "/api/collection",
       collection
@@ -424,7 +537,6 @@ export class MetabaseClient {
     id: number,
     updates: Partial<Collection>
   ): Promise<Collection> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.put(
       `/api/collection/${id}`,
       updates
@@ -433,50 +545,42 @@ export class MetabaseClient {
   }
 
   async deleteCollection(id: number): Promise<void> {
-    await this.ensureAuthenticated();
     await this.axiosInstance.delete(`/api/collection/${id}`);
   }
 
   // User operations
   async getUsers(includeDeactivated: boolean = false): Promise<User[]> {
-    await this.ensureAuthenticated();
     const params = includeDeactivated ? { include_deactivated: true } : {};
     const response = await this.axiosInstance.get("/api/user", { params });
     return response.data;
   }
 
   async getUser(id: number): Promise<User> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/user/${id}`);
     return response.data;
   }
 
   async createUser(user: Partial<User>): Promise<User> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post("/api/user", user);
     return response.data;
   }
 
   async updateUser(id: number, updates: Partial<User>): Promise<User> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.put(`/api/user/${id}`, updates);
     return response.data;
   }
 
   async deleteUser(id: number): Promise<void> {
-    await this.ensureAuthenticated();
     await this.axiosInstance.delete(`/api/user/${id}`);
   }
 
   // Permission operations
   async getPermissionGroups(): Promise<PermissionGroup[]> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get("/api/permissions/group");
     return response.data;
   }
 
   async createPermissionGroup(name: string): Promise<PermissionGroup> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post("/api/permissions/group", {
       name,
     });
@@ -487,7 +591,6 @@ export class MetabaseClient {
     id: number,
     name: string
   ): Promise<PermissionGroup> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.put(
       `/api/permissions/group/${id}`,
       { name }
@@ -496,31 +599,26 @@ export class MetabaseClient {
   }
 
   async deletePermissionGroup(id: number): Promise<void> {
-    await this.ensureAuthenticated();
     await this.axiosInstance.delete(`/api/permissions/group/${id}`);
   }
 
   // Activity operations
   async getMostRecentlyViewedDashboard(): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get("/api/activity/most_recently_viewed_dashboard");
     return response.data;
   }
 
   async getPopularItems(): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get("/api/activity/popular_items");
     return response.data;
   }
 
   async getRecentViews(): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get("/api/activity/recent_views");
     return response.data;
   }
 
   async getRecents(context: string[], includeMetadata: boolean = false): Promise<any> {
-    await this.ensureAuthenticated();
     const params = new URLSearchParams();
     
     context.forEach(ctx => {
@@ -534,7 +632,6 @@ export class MetabaseClient {
   }
 
   async postRecents(data: any): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post("/api/activity/recents", data);
     return response.data;
   }
@@ -546,7 +643,6 @@ export class MetabaseClient {
     pivotResults: boolean = false,
     visualizationSettings: any = {}
   ): Promise<any> {
-    await this.ensureAuthenticated();
     const data = {
       format_rows: formatRows,
       pivot_results: pivotResults,
@@ -560,33 +656,28 @@ export class MetabaseClient {
 
   // Table operations
   async getTables(ids?: number[]): Promise<any> {
-    await this.ensureAuthenticated();
     const params = ids ? { ids: ids.join(',') } : {};
     const response = await this.axiosInstance.get("/api/table", { params });
     return response.data;
   }
 
   async updateTables(ids: number[], updates: any): Promise<any> {
-    await this.ensureAuthenticated();
     const data = { ids, ...updates };
     const response = await this.axiosInstance.put("/api/table", data);
     return response.data;
   }
 
   async getCardTableFks(cardId: number): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/table/card__${cardId}/fks`);
     return response.data;
   }
 
   async getCardTableQueryMetadata(cardId: number): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/table/card__${cardId}/query_metadata`);
     return response.data;
   }
 
   async getTable(id: number, options: any = {}): Promise<any> {
-    await this.ensureAuthenticated();
     const params = new URLSearchParams();
     
     if (options.include_sensitive_fields !== undefined) {
@@ -605,13 +696,11 @@ export class MetabaseClient {
   }
 
   async updateTable(id: number, updateData: any): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.put(`/api/table/${id}`, updateData);
     return response.data;
   }
 
   async appendCsvToTable(id: number, filename: string, fileContent: string): Promise<any> {
-    await this.ensureAuthenticated();
     const formData = new FormData();
     
     const blob = new Blob([fileContent], { type: 'text/csv' });
@@ -624,25 +713,21 @@ export class MetabaseClient {
   }
 
   async discardTableFieldValues(id: number): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post(`/api/table/${id}/discard_values`);
     return response.data;
   }
 
   async reorderTableFields(id: number, fieldOrder: number[]): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.put(`/api/table/${id}/fields/order`, fieldOrder);
     return response.data;
   }
 
   async getTableFks(id: number): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/table/${id}/fks`);
     return response.data;
   }
 
   async getTableQueryMetadata(id: number, options: any = {}): Promise<any> {
-    await this.ensureAuthenticated();
     const params = new URLSearchParams();
     
     if (options.include_sensitive_fields !== undefined) {
@@ -661,13 +746,11 @@ export class MetabaseClient {
   }
 
   async getTableRelated(id: number): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.get(`/api/table/${id}/related`);
     return response.data;
   }
 
   async replaceTableCsv(id: number, csvFile: string): Promise<any> {
-    await this.ensureAuthenticated();
     const formData = new FormData();
     formData.append('csv_file', csvFile);
     const response = await this.axiosInstance.post(`/api/table/${id}/replace-csv`, formData, {
@@ -677,19 +760,16 @@ export class MetabaseClient {
   }
 
   async rescanTableFieldValues(id: number): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post(`/api/table/${id}/rescan_values`);
     return response.data;
   }
 
   async syncTableSchema(id: number): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.post(`/api/table/${id}/sync_schema`);
     return response.data;
   }
 
   async getTableData(tableId: number, limit?: number): Promise<any> {
-    await this.ensureAuthenticated();
     const params = new URLSearchParams();
     
     if (limit !== undefined) {
@@ -703,13 +783,13 @@ export class MetabaseClient {
     return response.data;
   }
 
+
   // Generic API method for other operations
   async apiCall(
     method: "GET" | "POST" | "PUT" | "DELETE",
     endpoint: string,
     data?: any
   ): Promise<any> {
-    await this.ensureAuthenticated();
     const response = await this.axiosInstance.request({
       method,
       url: endpoint,
