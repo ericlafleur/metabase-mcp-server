@@ -98,7 +98,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 
 ### Windsurf IDE
 
-Add to your Windsurf MCP config (`~/.windsurf/mcp_servers.json`):
+Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 
 ```json
 {
@@ -287,11 +287,6 @@ npm run build
 npm run watch
 ```
 
-### Testing
-```bash
-npm test
-```
-
 ### Debugging
 Use the MCP Inspector for debugging:
 ```bash
@@ -330,12 +325,6 @@ npm run inspector
 - Verify the requested resource exists
 - Review server logs for detailed error messages
 
-### Debug Mode
-Enable detailed logging:
-```bash
-DEBUG=* npx @windsurf-public/mcp-metabase-server
-```
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -361,8 +350,7 @@ Contributions are welcome! Please visit our [GitHub repository](https://github.c
 
 - 📚 [Documentation](https://github.com/usacognition/metabase-mcp-server/wiki)
 - 🐛 [Issue Tracker](https://github.com/usacognition/metabase-mcp-server/issues)
-- 💬 [Discussions](https://github.com/usacognition/metabase-mcp-server/discussions)
 
 ---
 
-Built with ❤️ for the MCP ecosystem
+Built with ❤️ for the world
