@@ -1,6 +1,6 @@
 # Readme: Metabase MCP Server
 
-[![npm version](https://badge.fury.io/js/%40windsurf-public%2Fmcp-metabase-server.svg)](https://badge.fury.io/js/%40windsurf-public%2Fmcp-metabase-server)
+[![npm version](https://img.shields.io/npm/v/@windsurf-public/mcp-metabase-server)](https://www.npmjs.com/package/@windsurf-public/mcp-metabase-server)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
