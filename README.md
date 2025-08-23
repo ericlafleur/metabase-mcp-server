@@ -39,6 +39,8 @@ Access Metabase entities via standardized URIs:
 
 ## 📦 Installation
 
+> **💡 Recommended:** Node.js 20.19.0+ and npm 8.0.0+ for optimal compatibility
+
 ### Method 1: NPX (Recommended)
 ```bash
 npx @windsurf-public/mcp-metabase-server
