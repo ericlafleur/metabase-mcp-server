@@ -9,6 +9,7 @@ import { addCardTools } from "./tools/card-tools.js";
 import { addTableTools } from "./tools/table-tools.js";
 import { addAdditionalTools } from "./tools/additional-tools.js";
 import { parseToolFilterOptions } from "./utils/tool-filters.js";
+import { addMetabaseResources } from "./resources/metabase-resources.js";
 
 // Parse command line arguments for tool filtering
 const filterOptions = parseToolFilterOptions();
@@ -52,6 +53,9 @@ addDatabaseTools(server, metabaseClient);
 addCardTools(server, metabaseClient);
 addTableTools(server, metabaseClient);
 addAdditionalTools(server, metabaseClient);
+
+// Adding all resources to the server
+addMetabaseResources(server, metabaseClient);
 
 // Log filtering status
 if (filterOptions.essentialOnly) {

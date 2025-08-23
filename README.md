@@ -29,13 +29,11 @@ npx @windsurf-public/mcp-metabase-server
 ### 🔗 MCP Resources
 
 Access Metabase entities via standardized URIs:
-- `metabase://dashboard/{id}` - Dashboard details
-- `metabase://card/{id}` - Question/card details  
-- `metabase://database/{id}` - Database information
-- `metabase://collection/{id}` - Collection details
-- `metabase://user/{id}` - User information
-- `metabase://table/{id}` - Table metadata
-- `metabase://field/{id}` - Field information
+- `metabase://dashboards` - All dashboards
+- `metabase://cards` - All cards/questions
+- `metabase://databases` - All database connections
+- `metabase://collections` - All collections
+- `metabase://users` - All users
 
 ## 📦 Installation
 

@@ -1,6 +1,6 @@
 {
   "name": "@windsurf-public/mcp-metabase-server",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A Model Context Protocol server for Metabase integration",
   "author": "Cognition <devin@cognition.ai>",
   "license": "MIT",
@@ -22,8 +22,7 @@
     "analytics",
     "business-intelligence",
     "ai",
-    "claude",
-    "metabase"
+    "claude"
   ],
   "private": false,
   "type": "module",
