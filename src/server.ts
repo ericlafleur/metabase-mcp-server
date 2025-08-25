@@ -31,16 +31,25 @@ const server = new FastMCP({
 const originalAddTool = server.addTool.bind(server);
 server.addTool = function(toolConfig: any) {
   const { metadata = {}, ...restConfig } = toolConfig;
-  const { isWrite, isEssential } = metadata;
+  const { isWrite, isEssential, isRead } = metadata;
 
-  // Skip non-essential tools when essential mode is enabled
-  if (filterOptions.essentialOnly && !isEssential) {
-    return;
-  }
-
-  // Skip non-write tools when write mode is disabled
-  if (filterOptions.writeMode && !isWrite) {
-    return;
+  // Apply filtering based on selected mode
+  switch (filterOptions.mode) {
+    case 'essential':
+      // Only load essential tools
+      if (!isEssential) return;
+      break;
+    case 'write':
+      // Only load write tools
+      if (!isWrite) return;
+      break;
+    case 'read':
+      // Only load read-only tools
+      if (!isRead) return;
+      break;
+    case 'all':
+      // Load all tools - no filtering
+      break;
   }
 
   // Register the tool
@@ -58,11 +67,21 @@ addAdditionalTools(server, metabaseClient);
 addMetabaseResources(server, metabaseClient);
 
 // Log filtering status
-if (filterOptions.essentialOnly) {
-  console.error(`INFO: Essential mode enabled`);
-}
-if (filterOptions.writeMode) {
-  console.error(`INFO: Write operations enabled`);
+console.error(`INFO: Tool filtering mode: ${filterOptions.mode} ${filterOptions.mode === 'essential' ? '(default)' : ''}`);
+
+switch (filterOptions.mode) {
+  case 'essential':
+    console.error(`INFO: Only essential tools loaded. Use --all to load all tools.`);
+    break;
+  case 'write':
+    console.error(`INFO: Only write/modification tools loaded.`);
+    break;
+  case 'read':
+    console.error(`INFO: Only read-only tools loaded.`);
+    break;
+  case 'all':
+    console.error(`INFO: All tools loaded.`);
+    break;
 }
 
 // Start the server

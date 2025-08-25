@@ -16,7 +16,7 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "list_tables",
     description: "Retrieve all Metabase tables with optional ID filtering - use this to discover available tables, explore database schema, or get metadata about specific tables",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       ids: z
         .array(z.number())
@@ -51,6 +51,7 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "update_tables",
     description: "Bulk update multiple Metabase tables with same configuration - use this to apply consistent settings, update metadata, or modify table properties efficiently",
+    metadata: { isWrite: true },
     parameters: z.object({
       ids: z.array(z.number()).describe("IDs of tables to update"),
       updates: z.object({}).describe("Update payload applied to all tables"),
@@ -85,7 +86,7 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_table",
     description: "Retrieve comprehensive table information including schema, fields, and metadata - use this to understand structure, explore fields, or get configuration details",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       include_sensitive_fields: z
@@ -557,6 +558,7 @@ export function addTableTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_table_data",
     description: "Retrieve sample data from table for preview and analysis - use this to examine content, verify quality, or understand data patterns",
+    metadata: { isRead: true },
     parameters: z.object({
       table_id: z.number().describe("Table ID"),
       limit: z.number().optional().describe("Row limit (default 1000)"),

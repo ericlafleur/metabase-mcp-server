@@ -75,12 +75,44 @@ export METABASE_USERNAME=your_username
 export METABASE_PASSWORD=your_password
 ```
 
+### Optional Arguments
+
+The server supports command-line arguments to customize tool loading:
+
+- **`--essential`** (default): Load only essential tools
+- **`--all`**: Load all 80+ available tools
+- **`--write`**: Load only write/modification tools
+- **`--read`**: Load only read-only tools
+
+```bash
+# Using published package (recommended)
+# Default behavior (essential tools only)
+npx @windsurf-public/mcp-metabase-server
+
+# Load all tools
+npx @windsurf-public/mcp-metabase-server --all
+
+# Load only write tools
+npx @windsurf-public/mcp-metabase-server --write
+
+# Load only read-only tools
+npx @windsurf-public/mcp-metabase-server --read
+
+# Using local development build
+npm run build
+node dist/server.js                    # Default (essential tools)
+node dist/server.js --all             # All tools
+node dist/server.js --write           # Write tools only
+node dist/server.js --read            # Read-only tools only
+```
+
 ## 🔌 Integration Examples
 
 ### Claude Desktop
 
 Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
+**Using published package:**
 ```json
 {
   "mcpServers": {
@@ -96,16 +128,89 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 }
 ```
 
+**Using local development build:**
+```json
+{
+  "mcpServers": {
+    "metabase": {
+      "command": "node",
+      "args": ["/path/to/metabase-mcp-server/dist/server.js"],
+      "env": {
+        "METABASE_URL": "https://your-metabase-instance.com",
+        "METABASE_API_KEY": "your_metabase_api_key"
+      }
+    }
+  }
+}
+```
+
+**With custom flags:**
+```json
+{
+  "mcpServers": {
+    "metabase-all": {
+      "command": "npx",
+      "args": ["@windsurf-public/mcp-metabase-server", "--all"],
+      "env": {
+        "METABASE_URL": "https://your-metabase-instance.com",
+        "METABASE_API_KEY": "your_metabase_api_key"
+      }
+    }
+  }
+}
+```
+
 ### Windsurf IDE
 
 Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 
+**Using published package:**
 ```json
 {
   "mcpServers": {
     "metabase": {
       "command": "npx",
       "args": ["@windsurf-public/mcp-metabase-server"],
+      "env": {
+        "METABASE_URL": "https://your-metabase-instance.com",
+        "METABASE_API_KEY": "your_metabase_api_key"
+      }
+    }
+  }
+}
+```
+
+**Using local development build:**
+```json
+{
+  "mcpServers": {
+    "metabase": {
+      "command": "node",
+      "args": ["/path/to/metabase-mcp-server/dist/server.js"],
+      "env": {
+        "METABASE_URL": "https://your-metabase-instance.com",
+        "METABASE_API_KEY": "your_metabase_api_key"
+      }
+    }
+  }
+}
+```
+
+**With custom flags:**
+```json
+{
+  "mcpServers": {
+    "metabase-read": {
+      "command": "npx",
+      "args": ["@windsurf-public/mcp-metabase-server", "--read"],
+      "env": {
+        "METABASE_URL": "https://your-metabase-instance.com",
+        "METABASE_API_KEY": "your_metabase_api_key"
+      }
+    },
+    "metabase-write": {
+      "command": "npx",
+      "args": ["@windsurf-public/mcp-metabase-server", "--write"],
       "env": {
         "METABASE_URL": "https://your-metabase-instance.com",
         "METABASE_API_KEY": "your_metabase_api_key"

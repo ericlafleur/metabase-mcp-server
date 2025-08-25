@@ -15,7 +15,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "list_databases",
     description: "Retrieve all database connections in Metabase - use this to discover available data sources, check connection status, or get an overview of connected databases",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     execute: async () => {
       try {
         const databases = await metabaseClient.getDatabases();
@@ -39,7 +39,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_database",
     description: "Retrieve detailed information about a specific Metabase database including connection details and schema - use this to examine database properties or troubleshoot connections",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       database_id: z.number().describe("The ID of the database to retrieve"),
     }),
@@ -348,7 +348,7 @@ export function addDatabaseTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "execute_query",
     description: "Execute a native SQL query against a Metabase database - use this for custom data analysis, complex queries, or extracting specific data not available through existing cards",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true},
     parameters: z.object({
       database_id: z.number().describe("The ID of the database to query against"),
       query: z.string().describe("The SQL query to execute"),

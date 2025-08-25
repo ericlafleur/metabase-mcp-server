@@ -16,7 +16,7 @@ export function addAdditionalTools(server: any, metabaseClient: MetabaseClient) 
   server.addTool({
     name: "get_collection_items",
     description: "Retrieve all items (cards, dashboards) within a Metabase collection - use this to explore collection contents, organize analytical assets, or understand content structure",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       collection_id: z.number().describe("Collection ID"),
     }),
@@ -97,7 +97,7 @@ export function addAdditionalTools(server: any, metabaseClient: MetabaseClient) 
   server.addTool({
     name: "search_content",
     description: "Search across all Metabase content including cards, dashboards, collections, and models - use this to find specific content, discover assets, or explore analytical resources",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z
       .object({
         q: z.string().min(1).describe("Search query"),
@@ -137,7 +137,7 @@ export function addAdditionalTools(server: any, metabaseClient: MetabaseClient) 
   server.addTool({
     name: "list_collections",
     description: "Retrieve all Metabase collections for organizing analytical content - use this to understand content structure, find collections, or explore organizational hierarchy",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       archived: z.boolean().optional().default(false).describe("Include archived collections"),
     }),
@@ -264,7 +264,7 @@ export function addAdditionalTools(server: any, metabaseClient: MetabaseClient) 
   server.addTool({
     name: "list_users",
     description: "Retrieve all Metabase users with their roles and permissions - use this to understand user access, manage permissions, or audit accounts",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       include_deactivated: z.boolean().optional().default(false).describe("Include deactivated users"),
     }),

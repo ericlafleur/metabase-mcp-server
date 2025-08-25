@@ -15,7 +15,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "list_dashboards",
     description: "Retrieve all Metabase dashboards - use this to discover available dashboards, get an overview of analytical content, or find specific dashboards",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     execute: async () => {
       try {
         const dashboards = await metabaseClient.getDashboards();
@@ -39,7 +39,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_dashboard",
     description: "Retrieve detailed information about a specific Metabase dashboard including cards, layout, and settings - use this to examine dashboard structure or get configuration details",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       dashboard_id: z.number().describe("The ID of the dashboard to retrieve"),
     }),
@@ -66,7 +66,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_dashboard_cards",
     description: "Retrieve all cards within a specific Metabase dashboard - use this to analyze dashboard content, understand data sources, or examine card configurations",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       dashboard_id: z.number().describe("The ID of the dashboard"),
     }),
@@ -94,7 +94,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_dashboard_related",
     description: "Retrieve entities related to a Metabase dashboard - use this to discover related content, find similar analytical views, or understand dashboard relationships",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       dashboard_id: z.number().describe("The ID of the dashboard"),
     }),
@@ -121,7 +121,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_dashboard_revisions",
     description: "Retrieve revision history for a Metabase dashboard - use this to track dashboard evolution, review past changes, or restore previous versions",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       dashboard_id: z.number().describe("The ID of the dashboard"),
     }),
@@ -146,6 +146,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
    */
   server.addTool({
     name: "list_embeddable_dashboards",
+    metadata: { isRead: true },
     description: "Retrieve all Metabase dashboards configured for embedding (requires superuser) - use this to audit embedded content or manage external integrations",
     execute: async () => {
       try {
@@ -168,6 +169,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
    */
   server.addTool({
     name: "list_public_dashboards",
+    metadata: { isRead: true },
     description: "Retrieve all Metabase dashboards with public URLs enabled (requires superuser) - use this to audit publicly accessible content or review security settings",
     execute: async () => {
       try {
@@ -194,7 +196,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "create_dashboard",
     description: "Create a new Metabase dashboard - use this to build new analytical views, organize related cards, or establish monitoring interfaces",
-    metadata: { isWrite: true },
+    metadata: { isWrite: true, isEssential: true },
     parameters: z.object({
       name: z.string().describe("Name of the dashboard (required)"),
       description: z.string().optional().describe("Description of the dashboard"),
@@ -256,6 +258,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
    */
   server.addTool({
     name: "copy_dashboard",
+    metadata: { isWrite: true },
     description: "Create a copy of an existing dashboard with all cards and layout - use this to create templates, backups, or variations of analytical views",
     parameters: z.object({
       from_dashboard_id: z.number().describe("The ID of the dashboard to copy"),
@@ -349,6 +352,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "revert_dashboard",
     description: "Restore a dashboard to a specific previous revision - use this to undo changes, restore deleted content, or return to known good configuration",
+    metadata: { isWrite: true },
     parameters: z.object({
       dashboard_id: z.number().describe("The ID of the dashboard"),
       revision_id: z.number().describe("The revision ID to revert to"),
@@ -376,6 +380,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "save_dashboard",
     description: "Save a complete dashboard object with nested data - use this for bulk operations or complex dashboard structures",
+    metadata: { isWrite: true },
     parameters: z.object({
       dashboard: z.object({}).describe("Dashboard object to save"),
     }),
@@ -403,6 +408,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "save_dashboard_to_collection",
     description: "Save a dashboard object directly into a specific collection - use this for organized dashboard creation or bulk imports",
+    metadata: { isWrite: true },
     parameters: z.object({
       parent_collection_id: z.number().describe("The parent collection ID"),
       dashboard: z.object({}).describe("Dashboard object to save"),
@@ -632,6 +638,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "execute_dashboard_card",
     description: "Execute a specific card from a dashboard and retrieve fresh data - use this to get current results from dashboard components or test card functionality",
+    metadata: { isRead: true },
     parameters: z.object({
       dashboard_id: z.number().describe("The ID of the dashboard containing the card"),
       card_id: z.number().describe("The ID of the card to execute"),
@@ -664,6 +671,7 @@ export function addDashboardTools(server: any, metabaseClient: MetabaseClient) {
    */
   server.addTool({
     name: "search_dashboards",
+    metadata: { isRead: true },
     description: "Search dashboards by name or description text - use this to find specific dashboards or discover related analytical content",
     parameters: z.object({
       query: z.string().describe("Search query string"),

@@ -17,7 +17,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "list_cards",
     description: "Retrieve all Metabase cards with optional filtering by source type (e.g., 'models') or model relationships - use this to discover available cards, find specific cards by type, or get an overview of all analytical content",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       f: z.string().optional().describe("Filter by source (e.g., 'models')"),
       model_id: z.number().optional().describe("Filter by model_id"),
@@ -47,6 +47,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_card",
     description: "Get complete metadata and configuration for a specific Metabase card including query definition, visualization settings, collection location, and permissions - use this when you need to examine or understand how a particular card is built",
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
     }),
@@ -258,6 +259,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "export_card_result",
     description: "Execute a Metabase card and export the results in a specific format (CSV, Excel, JSON, etc.) - use this to download data for external analysis, create reports for stakeholders, or integrate query results with other systems",
+    metadata: { isEssential: true },
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       export_format: z.string().describe("Export format (e.g., csv, xlsx, json)"),
@@ -329,7 +331,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_card_dashboards",
     description: "Find all dashboards that include a specific Metabase card - use this to understand where a card is being used, track dependencies before making changes, or find related analytical content",
-    metadata: { isEssential: true },
+    metadata: { isEssential: true, isRead: true },
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
     }),
@@ -359,6 +361,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "list_embeddable_cards",
     description: "Retrieve all Metabase cards configured for embedding in external applications (requires admin privileges) - use this to audit embedded content, manage external integrations, or review public-facing analytics",
+    metadata: { isRead: true },
     execute: async () => {
       try {
         const result = await metabaseClient.getEmbeddableCards();
@@ -445,6 +448,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "list_public_cards",
     description: "Retrieve all Metabase cards that have public URLs enabled (requires admin privileges) - use this to audit publicly accessible content, review security settings, or manage external data sharing",
+    metadata: { isRead: true },
     execute: async () => {
       try {
         const result = await metabaseClient.getPublicCards();
@@ -587,6 +591,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "get_card_param_values",
     description: "Retrieve all available values for a specific parameter in a Metabase card - use this to populate dropdown filters, validate parameter inputs, or understand what data options are available for interactive cards",
+    metadata: { isRead: true },
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       param_key: z.string().describe("Parameter key"),
@@ -623,6 +628,7 @@ export function addCardTools(server: any, metabaseClient: MetabaseClient) {
   server.addTool({
     name: "search_card_param_values",
     description: "Search and filter available parameter values for a Metabase card using a text query - use this to find specific parameter options in large datasets, help users locate filter values, or implement autocomplete functionality",
+    metadata: { isRead: true },
     parameters: z.object({
       card_id: z.number().describe("Card ID"),
       param_key: z.string().describe("Parameter key"),
