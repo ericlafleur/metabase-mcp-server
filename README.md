@@ -55,7 +55,7 @@ metabase-mcp-server
 docker run -it --rm \
   -e METABASE_URL=https://your-metabase-instance.com \
   -e METABASE_API_KEY=your_metabase_api_key \
-  ghcr.io/usacognition/metabase-mcp-server
+  ghcr.io/CognitionAI/metabase-mcp-server
 ```
 
 ## ⚙️ Configuration
@@ -377,7 +377,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 
 ### Setup
 ```bash
-git clone https://github.com/usacognition/metabase-mcp-server.git
+git clone https://github.com/CognitionAI/metabase-mcp-server.git
 cd metabase-mcp-server
 npm install
 ```
@@ -436,7 +436,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please visit our [GitHub repository](https://github.com/usacognition/metabase-mcp-server) to:
+Contributions are welcome! Please visit our [GitHub repository](https://github.com/CognitionAI/metabase-mcp-server) to:
 
 - 🐛 Report bugs
 - 💡 Request features  
@@ -453,8 +453,8 @@ Contributions are welcome! Please visit our [GitHub repository](https://github.c
 
 ## 🆘 Support
 
-- 📚 [Documentation](https://github.com/usacognition/metabase-mcp-server/wiki)
-- 🐛 [Issue Tracker](https://github.com/usacognition/metabase-mcp-server/issues)
+- 📚 [Documentation](https://github.com/CognitionAI/metabase-mcp-server/wiki)
+- 🐛 [Issue Tracker](https://github.com/CognitionAI/metabase-mcp-server/issues)
 
 ---
 

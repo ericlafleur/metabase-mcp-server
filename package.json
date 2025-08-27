@@ -1,19 +1,19 @@
 {
   "name": "@cognitionai/metabase-mcp-server",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "A Model Context Protocol server for Metabase integration",
   "author": "Cognition <devin@cognition.ai>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/usacognition/metabase-mcp-server.git"
+    "url": "https://github.com/CognitionAI/metabase-mcp-server.git"
   },
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/usacognition/metabase-mcp-server",
+  "homepage": "https://github.com/CognitionAI/metabase-mcp-server",
   "bugs": {
-    "url": "https://github.com/usacognition/metabase-mcp-server/issues"
+    "url": "https://github.com/CognitionAI/metabase-mcp-server/issues"
   },
   "keywords": [
     "mcp",
