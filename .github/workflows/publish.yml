@@ -32,7 +32,7 @@ jobs:
       id: version-check
       run: |
         CURRENT_VERSION=$(node -p "require('./package.json').version")
-        PUBLISHED_VERSION=$(npm view @windsurf-public/mcp-metabase-server version 2>/dev/null || echo "0.0.0")
+        PUBLISHED_VERSION=$(npm view @cognitionai/mcp-metabase-server version 2>/dev/null || echo "0.0.0")
         echo "current=$CURRENT_VERSION" >> $GITHUB_OUTPUT
         echo "published=$PUBLISHED_VERSION" >> $GITHUB_OUTPUT
         if [ "$CURRENT_VERSION" != "$PUBLISHED_VERSION" ]; then
@@ -47,7 +47,7 @@ jobs:
       if: steps.version-check.outputs.changed == 'true'
       run: npm publish
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ secrets.COGNITION_NPM_TOKEN }}
         
     - name: Create Git tag
       if: steps.version-check.outputs.changed == 'true'
