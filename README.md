@@ -1,6 +1,6 @@
 # Readme: Metabase MCP Server
 
-[![npm version](https://img.shields.io/npm/v/@cognitionai/mcp-metabase-server)](https://www.npmjs.com/package/@cognitionai/mcp-metabase-server)
+[![npm version](https://img.shields.io/npm/v/@cognitionai/metabase-mcp-server)](https://www.npmjs.com/package/@cognitionai/metabase-mcp-server)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat&logo=node.js&logoColor=white)](https://nodejs.org/)
@@ -13,7 +13,7 @@ A comprehensive Model Context Protocol (MCP) server for Metabase integration, pr
 # Install and run with npx
 export METABASE_URL=https://your-metabase-instance.com
 export METABASE_API_KEY=your_metabase_api_key
-npx @cognitionai/mcp-metabase-server
+npx @cognitionai/metabase-mcp-server
 ```
 
 ## ✨ Features
@@ -41,13 +41,13 @@ Access Metabase entities via standardized URIs:
 
 ### Method 1: NPX (Recommended)
 ```bash
-npx @cognitionai/mcp-metabase-server
+npx @cognitionai/metabase-mcp-server
 ```
 
 ### Method 2: Global Installation
 ```bash
-npm install -g @cognitionai/mcp-metabase-server
-mcp-metabase-server
+npm install -g @cognitionai/metabase-mcp-server
+metabase-mcp-server
 ```
 
 ### Method 3: Docker
@@ -55,7 +55,7 @@ mcp-metabase-server
 docker run -it --rm \
   -e METABASE_URL=https://your-metabase-instance.com \
   -e METABASE_API_KEY=your_metabase_api_key \
-  ghcr.io/usacognition/mcp-metabase-server
+  ghcr.io/usacognition/metabase-mcp-server
 ```
 
 ## ⚙️ Configuration
@@ -87,16 +87,16 @@ The server supports command-line arguments to customize tool loading:
 ```bash
 # Using published package (recommended)
 # Default behavior (essential tools only)
-npx @cognitionai/mcp-metabase-server
+npx @cognitionai/metabase-mcp-server
 
 # Load all tools
-npx @cognitionai/mcp-metabase-server --all
+npx @cognitionai/metabase-mcp-server --all
 
 # Load only write tools
-npx @cognitionai/mcp-metabase-server --write
+npx @cognitionai/metabase-mcp-server --write
 
 # Load only read-only tools
-npx @cognitionai/mcp-metabase-server --read
+npx @cognitionai/metabase-mcp-server --read
 
 # Using local development build
 npm run build
@@ -118,7 +118,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
   "mcpServers": {
     "metabase": {
       "command": "npx",
-      "args": ["@cognitionai/mcp-metabase-server"],
+      "args": ["@cognitionai/metabase-mcp-server"],
       "env": {
         "METABASE_URL": "https://your-metabase-instance.com",
         "METABASE_API_KEY": "your_metabase_api_key"
@@ -150,7 +150,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
   "mcpServers": {
     "metabase-all": {
       "command": "npx",
-      "args": ["@cognitionai/mcp-metabase-server", "--all"],
+      "args": ["@cognitionai/metabase-mcp-server", "--all"],
       "env": {
         "METABASE_URL": "https://your-metabase-instance.com",
         "METABASE_API_KEY": "your_metabase_api_key"
@@ -170,7 +170,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
   "mcpServers": {
     "metabase": {
       "command": "npx",
-      "args": ["@cognitionai/mcp-metabase-server"],
+      "args": ["@cognitionai/metabase-mcp-server"],
       "env": {
         "METABASE_URL": "https://your-metabase-instance.com",
         "METABASE_API_KEY": "your_metabase_api_key"
@@ -202,7 +202,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
   "mcpServers": {
     "metabase-read": {
       "command": "npx",
-      "args": ["@cognitionai/mcp-metabase-server", "--read"],
+      "args": ["@cognitionai/metabase-mcp-server", "--read"],
       "env": {
         "METABASE_URL": "https://your-metabase-instance.com",
         "METABASE_API_KEY": "your_metabase_api_key"
@@ -210,7 +210,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
     },
     "metabase-write": {
       "command": "npx",
-      "args": ["@cognitionai/mcp-metabase-server", "--write"],
+      "args": ["@cognitionai/metabase-mcp-server", "--write"],
       "env": {
         "METABASE_URL": "https://your-metabase-instance.com",
         "METABASE_API_KEY": "your_metabase_api_key"

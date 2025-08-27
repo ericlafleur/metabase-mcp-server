@@ -1,6 +1,6 @@
 {
-  "name": "@cognitionai/mcp-metabase-server",
-  "version": "1.0.8",
+  "name": "@cognitionai/metabase-mcp-server",
+  "version": "1.0.9",
   "description": "A Model Context Protocol server for Metabase integration",
   "author": "Cognition <devin@cognition.ai>",
   "license": "MIT",
@@ -28,7 +28,7 @@
   "type": "module",
   "main": "./dist/server.js",
   "bin": {
-    "mcp-metabase-server": "./dist/server.js"
+    "metabase-mcp-server": "./dist/server.js"
   },
   "files": [
     "dist",
@@ -42,8 +42,8 @@
     "start": "npm run build && node dist/server.js",
     "dev": "npx fastmcp dev src/server.ts",
     "clean": "rm -rf build dist",
-    "docker:build": "docker build -t mcp-metabase-server .",
-    "docker:run": "docker run -it --rm mcp-metabase-server",
+    "docker:build": "docker build -t metabase-mcp-server .",
+    "docker:run": "docker run -it --rm metabase-mcp-server",
     "docker:compose": "docker-compose up"
   },
   "dependencies": {

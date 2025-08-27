@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  mcp-metabase-server:
+  metabase-mcp-server:
     build: .
-    container_name: mcp-metabase-server
+    container_name: metabase-mcp-server
     environment:
       # Required: Your Metabase instance URL
       - METABASE_URL=https://your-metabase-instance.com

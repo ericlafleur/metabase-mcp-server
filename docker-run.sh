@@ -22,7 +22,7 @@ fi
 
 # Build the Docker image
 echo "Building Docker image..."
-docker build -t mcp-metabase-server .
+docker build -t metabase-mcp-server .
 
 if [ $? -ne 0 ]; then
     echo "Docker build failed!"
@@ -46,4 +46,4 @@ fi
 
 # Run the container
 echo "Starting MCP Metabase Server..."
-docker run -it --rm $ENV_VARS mcp-metabase-server
+docker run -it --rm $ENV_VARS metabase-mcp-server
