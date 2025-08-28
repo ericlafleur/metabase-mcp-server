@@ -206,18 +206,66 @@ export class MetabaseClient {
   }
 
   async addCardToDashboard(dashboardId: number, cardData: any): Promise<any> {
-    const response = await this.axiosInstance.post(`/api/dashboard/${dashboardId}/cards`, cardData);
+    // Get current dashboard to preserve existing state
+    const dashboard = await this.getDashboard(dashboardId);
+    const existingDashcards = (dashboard as any).dashcards || [];
+    
+    // Calculate position for new card (one card per row, full width)
+    const cardWidth = 12;
+    const cardHeight = 8;
+    const nextPosition = existingDashcards.length;
+    const row = nextPosition * cardHeight; // Stack vertically
+    const col = 0; // Always start at left edge
+
+    // Create new dashcard entry with id: -1 for new cards (as per Metabase convention)
+    const newDashcard = {
+      id: -1,
+      card_id: cardData.cardId || cardData.card_id,
+      row: cardData.row !== undefined ? cardData.row : row,
+      col: cardData.col !== undefined ? cardData.col : col,
+      size_x: cardData.size_x || cardData.sizeX || cardWidth,
+      size_y: cardData.size_y || cardData.sizeY || cardHeight,
+      parameter_mappings: cardData.parameter_mappings || [],
+      series: cardData.series || []
+    };
+    
+    // Combine existing dashcards with new dashcard
+    const updatedDashcards = [...existingDashcards, newDashcard];
+    
+    // Use PUT to update dashboard with new dashcards while preserving other properties
+    const response = await this.axiosInstance.put(`/api/dashboard/${dashboardId}`, {
+      ...dashboard,
+      dashcards: updatedDashcards
+    });
     return response.data;
   }
 
   async updateDashboardCards(dashboardId: number, cards: any[]): Promise<any> {
-    const response = await this.axiosInstance.put(`/api/dashboard/${dashboardId}/cards`, { cards });
+    // Get current dashboard to preserve existing properties
+    const dashboard = await this.getDashboard(dashboardId);
+    
+    // Replace all dashcards with the provided cards while preserving other properties
+    const response = await this.axiosInstance.put(`/api/dashboard/${dashboardId}`, {
+      ...dashboard,
+      dashcards: cards
+    });
     return response.data;
   }
 
   async removeCardsFromDashboard(dashboardId: number, cardIds: number[]): Promise<any> {
-    const response = await this.axiosInstance.delete(`/api/dashboard/${dashboardId}/cards`, {
-      data: { card_ids: cardIds }
+    // Get current dashboard to preserve existing properties
+    const dashboard = await this.getDashboard(dashboardId);
+    const existingDashcards = (dashboard as any).dashcards || [];
+    
+    // Filter out the cards to be removed
+    const filteredDashcards = existingDashcards.filter((dashcard: any) => 
+      !cardIds.includes(dashcard.card_id)
+    );
+    
+    // Update dashboard with filtered dashcards while preserving other properties
+    const response = await this.axiosInstance.put(`/api/dashboard/${dashboardId}`, {
+      ...dashboard,
+      dashcards: filteredDashcards
     });
     return response.data;
   }
