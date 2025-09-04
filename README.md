@@ -18,13 +18,13 @@ npx @cognitionai/metabase-mcp-server
 
 ## ✨ Features
 
-### 🎯 **80+ Tools Available** - Complete Metabase API Coverage
+### 🎯 **81+ Tools Available** - Complete Metabase API Coverage
 
 - **📊 Dashboard Management** (23 tools) - Full CRUD operations, card management, public sharing, embedding
 - **📈 Card/Question Management** (21 tools) - Query execution, parameter handling, pivot queries, public links
 - **🗄️ Database Management** (13 tools) - Connection management, schema sync, query execution
 - **📋 Table Management** (16 tools) - Metadata operations, field management, data operations
-- **🔍 Additional Tools** (8 tools) - Collections, search, users, activity tracking
+- **🔍 Additional Tools** (9 tools) - Collections, search, users, activity tracking, playground links
 
 ### 🔗 MCP Resources
 
@@ -355,7 +355,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 </details>
 
 <details>
-<summary><strong>🔍 Additional Tools (8 tools)</strong></summary>
+<summary><strong>🔍 Additional Tools (9 tools)</strong></summary>
 
 ### Collections
 - `list_collections` - List all collections
@@ -370,6 +370,9 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 ### Activity & Analytics
 - `get_recent_views` - Get recent activity
 - `get_popular_items` - Get popular content
+
+### Playground Links
+- `get_metabase_playground_link` - Generate interactive playground links
 
 </details>
 

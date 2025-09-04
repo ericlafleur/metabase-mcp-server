@@ -277,4 +277,59 @@ export function addAdditionalTools(server: any, metabaseClient: MetabaseClient) 
       }
     },
   });
+
+  /**
+   * Get a Metabase playground link for interactive query exploration
+   * 
+   * Creates a shareable Metabase playground link where users can see query results
+   * in a user-friendly interface and experiment with the data interactively.
+   * 
+   * @param {string} query - The SQL query to execute in the playground
+   * @param {string} [display] - Display type (table, bar, line, etc.)
+   * @returns {Promise<string>} JSON string with the playground URL
+   */
+  server.addTool({
+    name: "get_metabase_playground_link",
+    description: "Generate a Metabase playground link for interactive query exploration - allows users to see results and experiment with data in a user-friendly interface",
+    metadata: { isEssential: true },
+    parameters: z.object({
+      query: z.string().describe("The SQL query to execute in the playground"),
+      display: z.string().optional().default("table").describe("Display type (table, bar, line, etc.)"),
+    }),
+    execute: async (args: { query: string; display?: string }) => {
+      try {
+        const payload = {
+          dataset_query: {
+            type: "native",
+            native: {
+              template_tags: {},
+              query: args.query
+            }
+          },
+          display: args.display || "table",
+          parameters: [],
+          visualization_settings: {},
+          type: "question"
+        };
+
+        const queryB64 = Buffer.from(JSON.stringify(payload)).toString('base64');
+        const metabaseUrl = process.env.METABASE_URL;
+        
+        if (!metabaseUrl) {
+          throw new Error("METABASE_URL environment variable is required");
+        }
+
+        const playgroundUrl = `${metabaseUrl}/question#${queryB64}`;
+
+        return JSON.stringify({
+          playground_url: playgroundUrl,
+          query: args.query,
+          display: args.display || "table"
+        }, null, 2);
+
+      } catch (error) {
+        throw new Error(`Failed to generate playground link: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    },
+  });
 }
