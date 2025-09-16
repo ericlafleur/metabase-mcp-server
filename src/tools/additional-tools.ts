@@ -313,7 +313,7 @@ export function addAdditionalTools(server: any, metabaseClient: MetabaseClient) 
         };
 
         const queryB64 = Buffer.from(JSON.stringify(payload)).toString('base64');
-        const metabaseUrl = process.env.METABASE_URL;
+        const metabaseUrl = process.env.METABASE_PLAYGROUND_URL || process.env.METABASE_URL;
         
         if (!metabaseUrl) {
           throw new Error("METABASE_URL environment variable is required");
