@@ -29,6 +29,7 @@ npx @cognitionai/metabase-mcp-server
 ### 🔗 MCP Resources
 
 Access Metabase entities via standardized URIs:
+
 - `metabase://dashboards` - All dashboards
 - `metabase://cards` - All cards/questions
 - `metabase://databases` - All database connections
@@ -40,17 +41,20 @@ Access Metabase entities via standardized URIs:
 > **💡 Recommended:** Node.js 20.19.0+ and npm 8.0.0+ for optimal compatibility
 
 ### Method 1: NPX (Recommended)
+
 ```bash
 npx @cognitionai/metabase-mcp-server
 ```
 
 ### Method 2: Global Installation
+
 ```bash
 npm install -g @cognitionai/metabase-mcp-server
 metabase-mcp-server
 ```
 
 ### Method 3: Docker
+
 ```bash
 docker run -it --rm \
   -e METABASE_URL=https://your-metabase-instance.com \
@@ -63,12 +67,21 @@ docker run -it --rm \
 ### Environment Variables
 
 **API Key Authentication (Preferred):**
+
 ```bash
 export METABASE_URL=https://your-metabase-instance.com
 export METABASE_API_KEY=your_metabase_api_key
 ```
 
+**Session Token Authentication:**
+
+```bash
+export METABASE_URL=https://your-metabase-instance.com
+export METABASE_SESSION_TOKEN=your_session_token
+```
+
 **Username/Password Authentication (Fallback):**
+
 ```bash
 export METABASE_URL=https://your-metabase-instance.com
 export METABASE_USERNAME=your_username
@@ -113,6 +126,7 @@ node dist/server.js --read            # Read-only tools only
 Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
 **Using published package:**
+
 ```json
 {
   "mcpServers": {
@@ -129,6 +143,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 ```
 
 **Using local development build:**
+
 ```json
 {
   "mcpServers": {
@@ -145,6 +160,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 ```
 
 **With custom flags:**
+
 ```json
 {
   "mcpServers": {
@@ -165,6 +181,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 
 **Using published package:**
+
 ```json
 {
   "mcpServers": {
@@ -181,6 +198,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 ```
 
 **Using local development build:**
+
 ```json
 {
   "mcpServers": {
@@ -197,6 +215,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 ```
 
 **With custom flags:**
+
 ```json
 {
   "mcpServers": {
@@ -226,6 +245,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 <summary><strong>📊 Dashboard Management (23 tools)</strong></summary>
 
 ### Core Operations
+
 - `list_dashboards` - List all dashboards
 - `get_dashboard` - Get dashboard by ID
 - `create_dashboard` - Create new dashboard
@@ -234,6 +254,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 - `copy_dashboard` - Copy dashboard
 
 ### Card Management
+
 - `get_dashboard_cards` - Get all cards in dashboard
 - `add_card_to_dashboard` - Add card to dashboard
 - `remove_card_from_dashboard` - Remove card from dashboard
@@ -241,18 +262,21 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 - `execute_dashboard_card` - Execute specific dashboard card
 
 ### Public Sharing & Embedding
+
 - `create_public_link` - Create public dashboard link
 - `delete_public_link` - Delete public dashboard link
 - `list_public_dashboards` - List public dashboards
 - `list_embeddable_dashboards` - List embeddable dashboards
 
 ### Parameters & Queries
+
 - `get_dashboard_param_values` - Get parameter values
 - `search_dashboard_param_values` - Search parameter values
 - `get_dashboard_param_remapping` - Get parameter remapping
 - `execute_dashboard_query` - Execute dashboard queries
 
 ### Advanced Features
+
 - `get_dashboard_related` - Get related content
 - `get_dashboard_query_metadata` - Get query metadata
 - `update_dashboard_cards` - Bulk update cards
@@ -265,6 +289,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 <summary><strong>📈 Card/Question Management (21 tools)</strong></summary>
 
 ### Core Operations
+
 - `list_cards` - List all cards/questions
 - `get_card` - Get card by ID
 - `create_card` - Create new card
@@ -273,23 +298,27 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 - `copy_card` - Copy card
 
 ### Query Execution
+
 - `execute_card` - Execute card query
 - `execute_card_query_with_format` - Execute with specific format
 - `execute_pivot_card_query` - Execute pivot query
 - `get_card_query_metadata` - Get query metadata
 
 ### Card Management
+
 - `move_cards` - Move cards between collections
 - `move_cards_to_collection` - Bulk move to collection
 - `get_card_dashboards` - Get dashboards containing card
 - `get_card_series` - Get card series data
 
 ### Parameters & Values
+
 - `get_card_param_values` - Get parameter values
 - `search_card_param_values` - Search parameter values
 - `get_card_param_remapping` - Get parameter remapping
 
 ### Public Sharing
+
 - `create_card_public_link` - Create public card link
 - `delete_card_public_link` - Delete public card link
 - `get_public_cards` - List public cards
@@ -301,6 +330,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 <summary><strong>🗄️ Database Management (13 tools)</strong></summary>
 
 ### Core Operations
+
 - `list_databases` - List all databases
 - `get_database` - Get database details
 - `create_database` - Create database connection
@@ -308,16 +338,19 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 - `delete_database` - Delete database connection
 
 ### Schema & Metadata
+
 - `get_database_schema_tables` - Get database tables
 - `get_database_schemas` - Get database schemas
 - `get_database_metadata` - Get complete metadata
 - `sync_database_schema` - Sync schema metadata
 
 ### Query Operations
+
 - `execute_query` - Execute SQL queries
 - `execute_query_export` - Execute and export results
 
 ### Maintenance
+
 - `get_database_usage_info` - Get usage statistics
 - `rescan_database_field_values` - Rescan field values
 
@@ -327,28 +360,33 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 <summary><strong>📋 Table Management (16 tools)</strong></summary>
 
 ### Core Operations
+
 - `list_tables` - List tables with filtering
 - `get_table` - Get table details
 - `update_table` - Update table configuration
 - `update_tables` - Bulk update tables
 
 ### Data Operations
+
 - `get_table_data` - Retrieve table data
 - `append_csv_to_table` - Append CSV data
 - `replace_table_csv` - Replace with CSV data
 
 ### Schema & Relationships
+
 - `get_table_query_metadata` - Get query metadata
 - `get_table_fks` - Get foreign key relationships
 - `get_table_related` - Get related tables
 - `sync_table_schema` - Sync table schema
 
 ### Field Management
+
 - `reorder_table_fields` - Reorder field display
 - `rescan_table_field_values` - Rescan field values
 - `discard_table_field_values` - Discard cached values
 
 ### Card Integration
+
 - `get_card_table_fks` - Get card table foreign keys
 - `get_card_table_query_metadata` - Get card table metadata
 
@@ -358,6 +396,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 <summary><strong>🔍 Additional Tools (9 tools)</strong></summary>
 
 ### Collections
+
 - `list_collections` - List all collections
 - `create_collection` - Create new collection
 - `update_collection` - Update collection
@@ -365,13 +404,16 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 - `get_collection_items` - Get collection items
 
 ### Search & Discovery
+
 - `search_content` - Search across all content
 
 ### Activity & Analytics
+
 - `get_recent_views` - Get recent activity
 - `get_popular_items` - Get popular content
 
 ### Playground Links
+
 - `get_metabase_playground_link` - Generate interactive playground links
 
 </details>
@@ -379,6 +421,7 @@ Add to your Windsurf MCP config (`~/.windsurf/mcp_config.json`):
 ## 🧪 Development
 
 ### Setup
+
 ```bash
 git clone https://github.com/CognitionAI/metabase-mcp-server.git
 cd metabase-mcp-server
@@ -386,17 +429,21 @@ npm install
 ```
 
 ### Build
+
 ```bash
 npm run build
 ```
 
 ### Development Mode
+
 ```bash
 npm run watch
 ```
 
 ### Debugging
+
 Use the MCP Inspector for debugging:
+
 ```bash
 npm run inspector
 ```
@@ -404,12 +451,20 @@ npm run inspector
 ## 🔍 Testing Authentication
 
 ### API Key Authentication
+
 1. Set `METABASE_URL` and `METABASE_API_KEY`
 2. Start server and verify "Using Metabase API Key" in logs
 3. Test with `list_dashboards` tool
 
+### Session Token Authentication
+
+1. Set `METABASE_URL` and `METABASE_SESSION_TOKEN`
+2. Start server and verify "Using Metabase session token" in logs
+3. Test with `list_dashboards` tool
+
 ### Username/Password Authentication
-1. Unset `METABASE_API_KEY`
+
+1. Unset `METABASE_API_KEY` and `METABASE_SESSION_TOKEN`
 2. Set `METABASE_URL`, `METABASE_USERNAME`, `METABASE_PASSWORD`
 3. Start server and verify "Using username/password" in logs
 4. Test with `list_dashboards` tool
@@ -419,16 +474,19 @@ npm run inspector
 ### Common Issues
 
 **Authentication Errors:**
+
 - Verify your Metabase URL is accessible
 - Check API key validity in Metabase admin settings
 - Ensure username/password credentials are correct
 
 **Connection Issues:**
+
 - Confirm Metabase instance is running
 - Check network connectivity
 - Verify SSL certificates if using HTTPS
 
 **Tool Execution Errors:**
+
 - Check Metabase permissions for your user/API key
 - Verify the requested resource exists
 - Review server logs for detailed error messages
@@ -442,7 +500,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Contributions are welcome! Please visit our [GitHub repository](https://github.com/CognitionAI/metabase-mcp-server) to:
 
 - 🐛 Report bugs
-- 💡 Request features  
+- 💡 Request features
 - 🔧 Submit pull requests
 - 📖 Improve documentation
 

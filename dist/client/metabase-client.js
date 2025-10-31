@@ -22,6 +22,11 @@ export class MetabaseClient {
             this.axiosInstance.defaults.headers.common["X-API-Key"] = config.apiKey;
             this.sessionToken = "api_key_used";
         }
+        else if (config.sessionToken) {
+            this.logInfo("Using Metabase session token for authentication.");
+            this.sessionToken = config.sessionToken;
+            this.axiosInstance.defaults.headers.common["X-Metabase-Session"] = this.sessionToken;
+        }
         else if (config.username && config.password) {
             this.logInfo("Using Metabase username/password for authentication.");
         }
@@ -93,7 +98,7 @@ export class MetabaseClient {
      * Ensure authentication is ready
      */
     async ensureAuthenticated() {
-        if (!this.config.apiKey) {
+        if (!this.config.apiKey && !this.config.sessionToken) {
             await this.getSessionToken();
         }
     }
